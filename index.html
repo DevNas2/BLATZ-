@@ -1,327 +1,814 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BLAZT - Annuaire WhatsApp</title>
-  <!-- SDK Supabase -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BLAZT - Annuaire de Groupes & Chaînes WhatsApp</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- SDK Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --bg-color: #080b11;
+            --card-bg: #111827;
+            --accent-green: #25d366;
+            --accent-blue: #00f2fe;
+            --text-color: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #1f2937;
+            --danger-color: #ef4444;
+            --badge-gold: #f59e0b;
+        }
 
-    body {
-      background-color: #0d1117;
-      color: #c9d1d9;
-      padding: 15px;
-    }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-    header {
-      text-align: center;
-      margin-bottom: 25px;
-      padding-top: 10px;
-    }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding-bottom: 50px;
+        }
 
-    h1 {
-      color: #2ea44f;
-      font-size: 2rem;
-      letter-spacing: 1px;
-      margin-bottom: 6px;
-    }
+        /* HEADER */
+        header {
+            background: linear-gradient(180deg, #111827 0%, #080b11 100%);
+            border-bottom: 1px solid var(--border-color);
+            padding: 20px 15px;
+            text-align: center;
+            position: relative;
+        }
 
-    p.subtitle {
-      color: #8b949e;
-      font-size: 0.95rem;
-    }
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 900;
+            letter-spacing: 1px;
+            color: #fff;
+            text-transform: uppercase;
+        }
 
-    /* Barre de recherche */
-    .search-container {
-      max-width: 600px;
-      margin: 0 auto 25px auto;
-    }
+        .logo span {
+            color: var(--accent-green);
+        }
 
-    .search-bar {
-      width: 100%;
-      padding: 12px 16px;
-      border-radius: 8px;
-      border: 1px solid #30363d;
-      background: #161b22;
-      color: #f0f6fc;
-      font-size: 0.95rem;
-      outline: none;
-      transition: border-color 0.2s;
-    }
+        .tagline {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
 
-    .search-bar:focus {
-      border-color: #2ea44f;
-    }
+        .add-group-btn {
+            background: var(--accent-green);
+            color: #000;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin: 15px auto 0 auto;
+            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.2);
+        }
 
-    /* Grille des cartes */
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 16px;
-      max-width: 1100px;
-      margin: 0 auto;
-    }
+        /* BANNIÈRE PUBS */
+        .ad-container {
+            width: 100%;
+            max-width: 500px;
+            margin: 10px auto;
+            padding: 8px;
+            background: var(--card-bg);
+            border: 1px dashed #374151;
+            border-radius: 8px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+        }
 
-    /* Structure d'une carte de groupe */
-    .card {
-      background: #161b22;
-      border: 1px solid #30363d;
-      border-radius: 10px;
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    }
+        /* SECTION POPULAIRES (CARROUSEL) */
+        .popular-section {
+            width: 100%;
+            max-width: 500px;
+            margin: 15px auto 10px auto;
+            padding: 0 12px;
+        }
 
-    .card-header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 12px;
-    }
+        .section-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
-    .card-img {
-      width: 52px;
-      height: 52px;
-      border-radius: 50%;
-      object-fit: cover;
-      background: #21262d;
-      border: 1px solid #30363d;
-      flex-shrink: 0;
-    }
+        .section-title i {
+            color: var(--badge-gold);
+        }
 
-    .card-title {
-      font-weight: 600;
-      color: #f0f6fc;
-      font-size: 1.05rem;
-      line-height: 1.2;
-    }
+        .popular-carousel {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+            scrollbar-width: none;
+        }
 
-    .card-category {
-      display: inline-block;
-      font-size: 0.75rem;
-      background: #21262d;
-      color: #58a6ff;
-      padding: 2px 8px;
-      border-radius: 12px;
-      margin-top: 4px;
-      border: 1px solid rgba(88, 166, 255, 0.2);
-    }
+        .popular-carousel::-webkit-scrollbar {
+            display: none;
+        }
 
-    .card-desc {
-      font-size: 0.88rem;
-      color: #8b949e;
-      margin-bottom: 16px;
-      line-height: 1.4;
-      word-break: break-word;
-    }
+        .popular-card {
+            min-width: 200px;
+            max-width: 220px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px;
+            position: relative;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
 
-    /* Actions */
-    .card-actions {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-    }
+        .rank-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--badge-gold);
+            border: 1px solid rgba(245, 158, 11, 0.4);
+            font-size: 0.75rem;
+            font-weight: 800;
+            padding: 2px 7px;
+            border-radius: 10px;
+        }
 
-    .btn-join {
-      flex: 1;
-      text-align: center;
-      background: #238636;
-      color: #ffffff;
-      text-decoration: none;
-      padding: 9px 12px;
-      border-radius: 6px;
-      font-weight: 600;
-      font-size: 0.9rem;
-      transition: background 0.2s;
-    }
+        .popular-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
 
-    .btn-join:hover {
-      background: #2ea44f;
-    }
+        .popular-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: #1f2937;
+            border: 1px solid var(--accent-green);
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-green);
+        }
 
-    .btn-report {
-      background: transparent;
-      border: 1px solid #30363d;
-      color: #f85149;
-      padding: 8px 12px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 0.85rem;
-      transition: background 0.2s;
-    }
+        .popular-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #fff;
+            line-height: 1.2;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 110px;
+        }
 
-    .btn-report:hover {
-      background: #21262d;
-    }
+        .popular-clicks {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
 
-    .empty-state {
-      grid-column: 1 / -1;
-      text-align: center;
-      padding: 40px 10px;
-      color: #8b949e;
-    }
-  </style>
+        /* RECHERCHE ET FILTRES */
+        .controls {
+            width: 100%;
+            max-width: 500px;
+            margin: 10px auto;
+            padding: 0 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .search-box {
+            position: relative;
+            width: 100%;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 15px 12px 42px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: #fff;
+            outline: none;
+            font-size: 0.95rem;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        .categories {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+            scrollbar-width: none;
+        }
+
+        .categories::-webkit-scrollbar {
+            display: none;
+        }
+
+        .cat-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 7px 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            white-space: nowrap;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .cat-btn.active, .cat-btn:hover {
+            background: var(--accent-green);
+            color: #000;
+            font-weight: 600;
+            border-color: var(--accent-green);
+        }
+
+        /* GRILLE DE CARTES PRINCIPALE */
+        .group-grid {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 0 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .group-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 14px;
+            position: relative;
+        }
+
+        .group-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .group-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: #1f2937;
+            border: 2px solid var(--accent-green);
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-green);
+        }
+
+        .group-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #fff;
+            line-height: 1.3;
+        }
+
+        .group-category {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .group-desc {
+            font-size: 0.85rem;
+            color: #cbd5e1;
+            margin-bottom: 12px;
+            line-height: 1.4;
+            word-break: break-word;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .join-btn {
+            background: var(--accent-green);
+            color: #000;
+            text-decoration: none;
+            text-align: center;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            width: 100%;
+            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.2);
+            cursor: pointer;
+        }
+
+        /* MODAL DE SOUMISSION */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            width: 100%;
+            max-width: 450px;
+            border-radius: 14px;
+            padding: 20px;
+            position: relative;
+            margin: auto;
+        }
+
+        .modal-header {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.3rem;
+            cursor: pointer;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        .file-upload-box {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--bg-color);
+            padding: 10px;
+            border: 1px dashed var(--border-color);
+            border-radius: 8px;
+        }
+
+        .image-preview {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: #1f2937;
+            object-fit: cover;
+            display: none;
+            border: 1px solid var(--accent-green);
+        }
+
+        .submit-btn {
+            background: var(--accent-green);
+            color: #000;
+            border: none;
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border-color);
+        }
+    </style>
 </head>
 <body>
 
-  <header>
-    <h1>BLAZT</h1>
-    <p class="subtitle">Découvrez et rejoignez des communautés WhatsApp</p>
-  </header>
+    <!-- HEADER -->
+    <header>
+        <div class="logo">BLA<span>ZT</span></div>
+        <div class="tagline">Rejoins et partage tes liens WhatsApp</div>
+        <button class="add-group-btn" onclick="openModal()">
+            <i class="fa-solid fa-plus"></i> Ajouter un lien
+        </button>
+    </header>
 
-  <div class="search-container">
-    <input type="text" id="searchInput" class="search-bar" placeholder="Rechercher un groupe, un mot-clé, une catégorie..." onkeyup="filterGroups()">
-  </div>
+    <!-- EMPLACEMENT PUBLICITAIRE -->
+    <div class="ad-container">
+        <span>[ Emplacement Publicitaire / Bannière ]</span>
+    </div>
 
-  <div id="groupsGrid" class="grid">
-    <div class="empty-state">Chargement des communautés...</div>
-  </div>
+    <!-- SECTION GROUPES POPULAIRES (CARROUSEL) -->
+    <div class="popular-section" id="popularSection" style="display: none;">
+        <div class="section-title">
+            <i class="fa-solid fa-fire"></i> Groupes populaires
+        </div>
+        <div class="popular-carousel" id="popularCarousel">
+            <!-- Injecté dynamiquement -->
+        </div>
+    </div>
 
-  <script>
-    // --------------------------------------------------
-    // CONFIGURATION SUPABASE
-    // --------------------------------------------------
-    const SUPABASE_URL = "https://sfxamqoacoczxczgvocn.supabase.co"; 
-    const SUPABASE_ANON_KEY = "Sb_publishable_34Quu1yFLtyCrhu5-hNqyA_NQyOPtgh";
+    <!-- RECHERCHE & FILTRES -->
+    <div class="controls">
+        <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="searchInput" placeholder="Rechercher..." onkeyup="filterAndRender()">
+        </div>
+        <div class="categories">
+            <button class="cat-btn active" onclick="setCategory('Tous', this)">Tous</button>
+            <button class="cat-btn" onclick="setCategory('Communauté', this)">Communauté</button>
+            <button class="cat-btn" onclick="setCategory('Groupe', this)">Groupe</button>
+            <button class="cat-btn" onclick="setCategory('Chaîne', this)">Chaîne</button>
+        </div>
+    </div>
 
-    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    <!-- GRILLE DE GROUPES PRINCIPALE -->
+    <div class="group-grid" id="groupGrid">
+        <div style="text-align:center; color:var(--text-muted); padding:30px 20px;">Chargement des groupes...</div>
+    </div>
 
-    let allGroups = [];
-
-    // 1. Récupération des groupes depuis Supabase
-    async function loadGroups() {
-      const { data, error } = await supabaseClient
-        .from('groups')
-        .select('*');
-
-      if (error) {
-        console.error("Erreur de chargement:", error);
-        document.getElementById('groupsGrid').innerHTML = '<div class="empty-state" style="color: #f85149;">Impossible de charger la liste des groupes. Vérifiez la connexion à Supabase.</div>';
-        return;
-      }
-
-      allGroups = data || [];
-      renderGroups(allGroups);
-    }
-
-    // 2. Génération du HTML des cartes
-    function renderGroups(groups) {
-      const grid = document.getElementById('groupsGrid');
-      grid.innerHTML = '';
-
-      if (groups.length === 0) {
-        grid.innerHTML = '<div class="empty-state">Aucun groupe ne correspond à votre recherche.</div>';
-        return;
-      }
-
-      groups.forEach(group => {
-        const imageSrc = (group.image && typeof group.image === 'string' && group.image.trim() !== '') 
-          ? group.image 
-          : 'https://via.placeholder.com/150/21262d/ffffff?text=WA';
-        
-        const cardHtml = `
-          <div class="card">
-            <div>
-              <div class="card-header">
-                <img src="${imageSrc}" alt="${group.name}" class="card-img" onerror="this.src='https://via.placeholder.com/150/21262d/ffffff?text=WA'">
-                <div>
-                  <div class="card-title">${group.name}</div>
-                  <span class="card-category">${group.category || 'Général'}</span>
+    <!-- MODALE D'AJOUT -->
+    <div class="modal" id="addGroupModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>Ajouter un lien WhatsApp</span>
+                <button class="close-modal" onclick="closeModal()">&times;</button>
+            </div>
+            <div id="groupForm">
+                <div class="form-group">
+                    <label>Nom du groupe / chaîne</label>
+                    <input type="text" id="groupName" placeholder="Ex: Actualités Tech 2026">
                 </div>
-              </div>
-              <p class="card-desc">${group.description || 'Aucune description fournie.'}</p>
+                <div class="form-group">
+                    <label>Catégorie</label>
+                    <select id="groupCategory">
+                        <option value="Communauté">Communauté</option>
+                        <option value="Groupe">Groupe</option>
+                        <option value="Chaîne">Chaîne</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Lien d'invitation WhatsApp</label>
+                    <input type="url" id="groupLink" placeholder="https://chat.whatsapp.com/...">
+                </div>
+                <div class="form-group">
+                    <label>Image de profil (Optionnel)</label>
+                    <div class="file-upload-box">
+                        <input type="file" id="groupImageFile" accept="image/*" onchange="previewSelectedImage(event)">
+                        <img id="previewImg" class="image-preview" alt="Preview">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="groupDesc" rows="3" placeholder="De quoi s'agit-il ?"></textarea>
+                </div>
+                <button type="button" class="submit-btn" id="btnPublish" onclick="addNewGroup()">Publier</button>
             </div>
-            <div class="card-actions">
-              <a href="${group.link || '#'}" target="_blank" class="btn-join">Rejoindre</a>
-              <button onclick="reportGroup('${group.id}')" class="btn-report" title="Signaler ce lien">🚩 Signaler</button>
-            </div>
-          </div>
-        `;
-        grid.innerHTML += cardHtml;
-      });
-    }
+        </div>
+    </div>
 
-    // 3. Filtrage en temps réel
-    function filterGroups() {
-      const query = document.getElementById('searchInput').value.toLowerCase().trim();
-      const filtered = allGroups.filter(g => 
-        (g.name && g.name.toLowerCase().includes(query)) ||
-        (g.category && g.category.toLowerCase().includes(query)) ||
-        (g.description && g.description.toLowerCase().includes(query))
-      );
-      renderGroups(filtered);
-    }
+    <footer>
+        <p>&copy; 2026 BLAZT. Tous droits réservés.</p>
+    </footer>
 
-    // 4. Signalement (Suppression automatique au bout de 7 signalements)
-    async function reportGroup(groupId) {
-      if (!confirm("Voulez-vous signaler ce groupe comme lien expiré, cassé ou inapproprié ?")) return;
+    <script>
+        // ================= CONFIGURATION SUPABASE =================
+        const SUPABASE_URL = 'https://sfxamqoacoczxczgvocn.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_34Quu1yFLtyCrhu5-hNqyA_NQyOPtgh';
+        
+        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        // ========================================================
 
-      let visitorId = localStorage.getItem('blazt_visitor_id');
-      if (!visitorId) {
-        visitorId = 'visitor_' + Math.random().toString(36).substring(2, 11);
-        localStorage.setItem('blazt_visitor_id', visitorId);
-      }
+        let allGroups = [];
+        let currentCategory = 'Tous';
+        let compressedImageBase64 = "";
 
-      const { data: group, error } = await supabaseClient
-        .from('groups')
-        .select('reports_count, reported_by')
-        .eq('id', groupId)
-        .single();
+        // COMPRESSION D'IMAGE (CANVAS)
+        function previewSelectedImage(event) {
+            const file = event.target.files[0];
+            const preview = document.getElementById('previewImg');
+            
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.src = e.target.result;
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+                        const maxSize = 200;
+                        
+                        let width = img.width;
+                        let height = img.height;
 
-      if (error || !group) {
-        return alert("Erreur lors de la prise en compte du signalement.");
-      }
+                        if (width > height) {
+                            if (width > maxSize) {
+                                height *= maxSize / width;
+                                width = maxSize;
+                            }
+                        } else {
+                            if (height > maxSize) {
+                                width *= maxSize / height;
+                                height = maxSize;
+                            }
+                        }
 
-      const reportedBy = group.reported_by || [];
-      const currentReports = group.reports_count || 0;
+                        canvas.width = width;
+                        canvas.height = height;
+                        ctx.drawImage(img, 0, 0, width, height);
 
-      if (reportedBy.includes(visitorId)) {
-        return alert("Vous avez déjà signalé ce groupe.");
-      }
-
-      reportedBy.push(visitorId);
-      const newReportCount = currentReports + 1;
-
-      if (newReportCount >= 7) {
-        const { error: deleteError } = await supabaseClient
-          .from('groups')
-          .delete()
-          .eq('id', groupId);
-
-        if (!deleteError) {
-          alert("Ce groupe a été automatiquement supprimé suite à 7 signalements.");
-          loadGroups();
-        } else {
-          alert("Erreur lors de la suppression du groupe.");
+                        compressedImageBase64 = canvas.toDataURL('image/jpeg', 0.7);
+                        preview.src = compressedImageBase64;
+                        preview.style.display = 'block';
+                    };
+                };
+                reader.readAsDataURL(file);
+            } else {
+                compressedImageBase64 = "";
+                preview.style.display = 'none';
+            }
         }
-      } else {
-        const { error: updateError } = await supabaseClient
-          .from('groups')
-          .update({
-            reports_count: newReportCount,
-            reported_by: reportedBy
-          })
-          .eq('id', groupId);
 
-        if (!updateError) {
-          alert(`Signalement pris en compte (${newReportCount}/7). Merci !`);
-        } else {
-          alert("Impossible de mettre à jour le signalement.");
+        // CHARGEMENT DEPUIS SUPABASE
+        async function loadGroups() {
+            const { data, error } = await _supabase
+                .from('groups')
+                .select('*');
+
+            if (error) {
+                console.error('Erreur Supabase :', error);
+                document.getElementById('groupGrid').innerHTML = '<div style="text-align:center; color:var(--danger-color); padding:30px 20px;">Erreur de connexion avec la base de données.</div>';
+                return;
+            }
+
+            allGroups = data || [];
+            renderPopularSection();
+            filterAndRender();
         }
-      }
-    }
 
-    loadGroups();
-  </script>
+        // AFFICHAGE DU CARROUSEL DES GROUPES POPULAIRES
+        function renderPopularSection() {
+            const section = document.getElementById('popularSection');
+            const carousel = document.getElementById('popularCarousel');
+
+            // Filtrer et trier les groupes ayant au moins 1 clic, triés par clics décroissants
+            const popularGroups = [...allGroups]
+                .sort((a, b) => (b.clicks || 0) - (a.clicks || 0))
+                .slice(0, 5); // Prendre les 5 premiers
+
+            if (popularGroups.length === 0) {
+                section.style.display = 'none';
+                return;
+            }
+
+            section.style.display = 'block';
+            carousel.innerHTML = '';
+
+            popularGroups.forEach((group, index) => {
+                const imageSrc = (group.image && typeof group.image === 'string' && group.image.trim() !== '') 
+                    ? group.image 
+                    : '';
+
+                const avatarHtml = imageSrc 
+                    ? `<img src="${imageSrc}" class="popular-avatar" alt="${group.name}">`
+                    : `<div class="popular-avatar"><i class="fa-solid fa-users"></i></div>`;
+
+                const clicksCount = group.clicks || 0;
+
+                const cardHtml = `
+                    <div class="popular-card">
+                        <span class="rank-badge">#${index + 1}</span>
+                        <div>
+                            <div class="popular-header">
+                                ${avatarHtml}
+                                <div>
+                                    <div class="popular-title">${group.name}</div>
+                                    <div class="popular-clicks"><i class="fa-solid fa-eye"></i> ${clicksCount} vue${clicksCount > 1 ? 's' : ''}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <a href="${group.link || '#'}" target="_blank" onclick="trackClick('${group.id}')" class="join-btn" style="padding: 6px; font-size: 0.8rem; margin-top: 6px;">
+                            <i class="fa-brands fa-whatsapp"></i> Rejoindre
+                        </a>
+                    </div>
+                `;
+                carousel.innerHTML += cardHtml;
+            });
+        }
+
+        // AUGMENTER LE COMPTEUR DE CLICS / POPULARITÉ
+        async function trackClick(groupId) {
+            const group = allGroups.find(g => g.id === groupId);
+            if (!group) return;
+
+            const newClicks = (group.clicks || 0) + 1;
+            group.clicks = newClicks; // Mise à jour locale rapide
+
+            // Mise à jour sur Supabase
+            await _supabase
+                .from('groups')
+                .update({ clicks: newClicks })
+                .eq('id', groupId);
+            
+            renderPopularSection();
+        }
+
+        // GESTION DES FILTRES DE CATÉGORIE
+        function setCategory(category, btnElement) {
+            currentCategory = category;
+            document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('active'));
+            btnElement.classList.add('active');
+            filterAndRender();
+        }
+
+        // FILTRAGE COMBINÉ (RECHERCHE + CATÉGORIE)
+        function filterAndRender() {
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+
+            const filtered = allGroups.filter(g => {
+                const matchesCategory = (currentCategory === 'Tous') || 
+                                        (g.category && g.category.toLowerCase() === currentCategory.toLowerCase());
+                
+                const matchesSearch = (g.name && g.name.toLowerCase().includes(query)) ||
+                                      (g.category && g.category.toLowerCase().includes(query)) ||
+                                      (g.description && g.description.toLowerCase().includes(query));
+
+                return matchesCategory && matchesSearch;
+            });
+
+            renderGroups(filtered);
+        }
+
+        // AFFICHAGE DES GROUPES (GRILLE PRINCIPALE)
+        function renderGroups(groups) {
+            const container = document.getElementById('groupGrid');
+            container.innerHTML = '';
+
+            if (groups.length === 0) {
+                container.innerHTML = '<div style="text-align:center; color:var(--text-muted); padding:30px 20px;">Aucun groupe ne correspond à votre recherche.</div>';
+                return;
+            }
+
+            groups.forEach(group => {
+                const card = document.createElement('div');
+                card.className = 'group-card';
+
+                const imageSrc = (group.image && typeof group.image === 'string' && group.image.trim() !== '') 
+                    ? group.image 
+                    : '';
+
+                const avatarHtml = imageSrc 
+                    ? `<img src="${imageSrc}" class="group-avatar" alt="${group.name}">`
+                    : `<div class="group-avatar"><i class="fa-solid fa-users" style="font-size: 1.2rem;"></i></div>`;
+
+                card.innerHTML = `
+                    <div class="group-header">
+                        ${avatarHtml}
+                        <div>
+                            <div class="group-title">${group.name}</div>
+                            <div class="group-category">${group.category || 'Général'}</div>
+                        </div>
+                    </div>
+                    <div class="group-desc">${group.description || 'Aucune description.'}</div>
+                    <div class="card-actions">
+                        <a href="${group.link || '#'}" target="_blank" onclick="trackClick('${group.id}')" class="join-btn">
+                            <i class="fa-brands fa-whatsapp" style="font-size: 1.1rem;"></i> Rejoindre
+                        </a>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function openModal() {
+            document.getElementById('addGroupModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('addGroupModal').style.display = 'none';
+        }
+
+        // AJOUT D'UN GROUPE
+        async function addNewGroup() {
+            const name = document.getElementById('groupName').value.trim();
+            const category = document.getElementById('groupCategory').value;
+            const link = document.getElementById('groupLink').value.trim();
+            const description = document.getElementById('groupDesc').value.trim();
+
+            if (!name || !link || !description) {
+                alert("Veuillez remplir tous les champs obligatoires (Nom, Lien, Description).");
+                return;
+            }
+
+            const newRecord = {
+                name: name,
+                category: category,
+                link: link,
+                description: description,
+                image: compressedImageBase64,
+                clicks: 0
+            };
+
+            const btn = document.getElementById('btnPublish');
+            btn.textContent = "Publication...";
+            btn.disabled = true;
+
+            const { error } = await _supabase
+                .from('groups')
+                .insert([newRecord]);
+
+            btn.textContent = "Publier";
+            btn.disabled = false;
+
+            if (error) {
+                alert("Erreur lors de la publication : " + error.message);
+                return;
+            }
+
+            // Réinitialisation & Fermeture
+            document.getElementById('groupName').value = '';
+            document.getElementById('groupLink').value = '';
+            document.getElementById('groupDesc').value = '';
+            document.getElementById('groupImageFile').value = '';
+            document.getElementById('previewImg').style.display = 'none';
+            compressedImageBase64 = "";
+            closeModal();
+
+            loadGroups();
+        }
+
+        // CHARGEMENT INITIAL
+        window.onload = () => {
+            loadGroups();
+        };
+    </script>
 </body>
 </html>
