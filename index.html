@@ -1,667 +1,327 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BLAZT - Annuaire de Groupes & Chaînes WhatsApp</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- SDK Supabase -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        :root {
-            --bg-color: #080b11;
-            --card-bg: #111827;
-            --accent-green: #25d366;
-            --accent-blue: #00f2fe;
-            --text-color: #f8fafc;
-            --text-muted: #94a3b8;
-            --border-color: #1f2937;
-            --danger-color: #ef4444;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BLAZT - Annuaire WhatsApp</title>
+  <!-- SDK Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
+    body {
+      background-color: #0d1117;
+      color: #c9d1d9;
+      padding: 15px;
+    }
 
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            padding-bottom: 50px;
-        }
+    header {
+      text-align: center;
+      margin-bottom: 25px;
+      padding-top: 10px;
+    }
 
-        /* HEADER */
-        header {
-            background: linear-gradient(180deg, #111827 0%, #080b11 100%);
-            border-bottom: 1px solid var(--border-color);
-            padding: 20px 15px;
-            text-align: center;
-            position: relative;
-        }
+    h1 {
+      color: #2ea44f;
+      font-size: 2rem;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
 
-        .logo {
-            font-size: 1.8rem;
-            font-weight: 900;
-            letter-spacing: 1px;
-            color: #fff;
-            text-transform: uppercase;
-        }
+    p.subtitle {
+      color: #8b949e;
+      font-size: 0.95rem;
+    }
 
-        .logo span {
-            color: var(--accent-green);
-        }
+    /* Barre de recherche */
+    .search-container {
+      max-width: 600px;
+      margin: 0 auto 25px auto;
+    }
 
-        .tagline {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin-top: 4px;
-        }
+    .search-bar {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 8px;
+      border: 1px solid #30363d;
+      background: #161b22;
+      color: #f0f6fc;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
 
-        /* BOUTON AJOUTER UN LIEN */
-        .add-group-btn {
-            background: var(--accent-green);
-            color: #000;
-            border: none;
-            padding: 10px 18px;
-            border-radius: 20px;
-            font-weight: bold;
-            font-size: 0.9rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin: 15px auto 0 auto;
-            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.2);
-        }
+    .search-bar:focus {
+      border-color: #2ea44f;
+    }
 
-        /* EMPLACEMENT PUBLICITAIRE */
-        .ad-container {
-            width: 100%;
-            max-width: 500px;
-            margin: 10px auto;
-            padding: 8px;
-            background: var(--card-bg);
-            border: 1px dashed #374151;
-            border-radius: 8px;
-            text-align: center;
-            color: var(--text-muted);
-            font-size: 0.75rem;
-        }
+    /* Grille des cartes */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
 
-        /* RECHERCHE & FILTRES */
-        .controls {
-            width: 100%;
-            max-width: 500px;
-            margin: 15px auto;
-            padding: 0 12px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
+    /* Structure d'une carte de groupe */
+    .card {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 10px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
 
-        .search-box {
-            position: relative;
-            width: 100%;
-        }
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
 
-        .search-box input {
-            width: 100%;
-            padding: 12px 15px 12px 42px;
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            color: #fff;
-            outline: none;
-            font-size: 0.95rem;
-        }
+    .card-img {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #21262d;
+      border: 1px solid #30363d;
+      flex-shrink: 0;
+    }
 
-        .search-box i {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-muted);
-        }
+    .card-title {
+      font-weight: 600;
+      color: #f0f6fc;
+      font-size: 1.05rem;
+      line-height: 1.2;
+    }
 
-        .categories {
-            display: flex;
-            gap: 8px;
-            overflow-x: auto;
-            padding-bottom: 4px;
-            scrollbar-width: none;
-        }
+    .card-category {
+      display: inline-block;
+      font-size: 0.75rem;
+      background: #21262d;
+      color: #58a6ff;
+      padding: 2px 8px;
+      border-radius: 12px;
+      margin-top: 4px;
+      border: 1px solid rgba(88, 166, 255, 0.2);
+    }
 
-        .categories::-webkit-scrollbar {
-            display: none;
-        }
+    .card-desc {
+      font-size: 0.88rem;
+      color: #8b949e;
+      margin-bottom: 16px;
+      line-height: 1.4;
+      word-break: break-word;
+    }
 
-        .cat-btn {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            color: var(--text-muted);
-            padding: 7px 14px;
-            border-radius: 20px;
-            cursor: pointer;
-            white-space: nowrap;
-            font-size: 0.85rem;
-            transition: all 0.2s;
-        }
+    /* Actions */
+    .card-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
 
-        .cat-btn.active, .cat-btn:hover {
-            background: var(--accent-green);
-            color: #000;
-            font-weight: 600;
-            border-color: var(--accent-green);
-        }
+    .btn-join {
+      flex: 1;
+      text-align: center;
+      background: #238636;
+      color: #ffffff;
+      text-decoration: none;
+      padding: 9px 12px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: background 0.2s;
+    }
 
-        /* GRILLE MOBILE */
-        .group-grid {
-            width: 100%;
-            max-width: 500px;
-            margin: 0 auto;
-            padding: 0 12px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
+    .btn-join:hover {
+      background: #2ea44f;
+    }
 
-        .group-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 14px;
-            position: relative;
-        }
+    .btn-report {
+      background: transparent;
+      border: 1px solid #30363d;
+      color: #f85149;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: background 0.2s;
+    }
 
-        .group-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 10px;
-        }
+    .btn-report:hover {
+      background: #21262d;
+    }
 
-        .group-avatar {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            object-fit: cover;
-            background: #1f2937;
-            border: 2px solid var(--accent-green);
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--accent-green);
-        }
-
-        .group-title {
-            font-size: 1rem;
-            font-weight: 600;
-            color: #fff;
-            line-height: 1.3;
-        }
-
-        .group-category {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            margin-top: 2px;
-        }
-
-        .group-desc {
-            font-size: 0.85rem;
-            color: #cbd5e1;
-            margin-bottom: 12px;
-            line-height: 1.4;
-        }
-
-        .join-btn {
-            background: var(--accent-green);
-            color: #000;
-            text-decoration: none;
-            text-align: center;
-            padding: 11px;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 0.95rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            width: 100%;
-            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.2);
-        }
-
-        .delete-btn {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            background: rgba(239, 68, 68, 0.15);
-            color: var(--danger-color);
-            border: 1px solid var(--danger-color);
-            padding: 5px 9px;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        /* MODALE */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-            padding: 15px;
-            overflow-y: auto;
-        }
-
-        .modal-content {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            width: 100%;
-            max-width: 450px;
-            border-radius: 14px;
-            padding: 20px;
-            position: relative;
-            margin: auto;
-        }
-
-        .modal-header {
-            font-size: 1.2rem;
-            font-weight: bold;
-            margin-bottom: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .close-modal {
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            font-size: 1.3rem;
-            cursor: pointer;
-        }
-
-        .form-group {
-            margin-bottom: 12px;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin-bottom: 5px;
-        }
-
-        .form-group input, .form-group select, .form-group textarea {
-            width: 100%;
-            padding: 10px;
-            background: var(--bg-color);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            color: #fff;
-            font-size: 0.9rem;
-            outline: none;
-        }
-
-        .file-upload-box {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            background: var(--bg-color);
-            padding: 10px;
-            border: 1px dashed var(--border-color);
-            border-radius: 8px;
-        }
-
-        .image-preview {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            background: #1f2937;
-            object-fit: cover;
-            display: none;
-            border: 1px solid var(--accent-green);
-        }
-
-        .submit-btn {
-            background: var(--accent-green);
-            color: #000;
-            border: none;
-            width: 100%;
-            padding: 12px;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 1rem;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-
-        footer {
-            text-align: center;
-            margin-top: 30px;
-            padding: 15px;
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            border-top: 1px solid var(--border-color);
-        }
-    </style>
+    .empty-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 40px 10px;
+      color: #8b949e;
+    }
+  </style>
 </head>
 <body>
 
-    <!-- HEADER -->
-    <header>
-        <div class="logo">BLA<span>ZT</span></div>
-        <div class="tagline">Rejoins et partage tes liens WhatsApp</div>
-        <button class="add-group-btn" onclick="openModal()">
-            <i class="fa-solid fa-plus"></i> Ajouter un lien
-        </button>
-    </header>
+  <header>
+    <h1>BLAZT</h1>
+    <p class="subtitle">Découvrez et rejoignez des communautés WhatsApp</p>
+  </header>
 
-    <!-- PUBLICITÉ -->
-    <div class="ad-container">
-        <span>[ Emplacement Publicitaire / Bannière ]</span>
-    </div>
+  <div class="search-container">
+    <input type="text" id="searchInput" class="search-bar" placeholder="Rechercher un groupe, un mot-clé, une catégorie..." onkeyup="filterGroups()">
+  </div>
 
-    <!-- RECHERCHE & FILTRES -->
-    <div class="controls">
-        <div class="search-box">
-            <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="text" id="searchInput" placeholder="Rechercher..." onkeyup="filterGroups()">
-        </div>
-        <div class="categories">
-            <button class="cat-btn active" onclick="filterCategory('all', this)">Tous</button>
-            <button class="cat-btn" onclick="filterCategory('Communauté', this)">Communauté</button>
-            <button class="cat-btn" onclick="filterCategory('Groupe', this)">Groupe</button>
-            <button class="cat-btn" onclick="filterCategory('Chaîne', this)">Chaîne</button>
-        </div>
-    </div>
+  <div id="groupsGrid" class="grid">
+    <div class="empty-state">Chargement des communautés...</div>
+  </div>
 
-    <!-- GRILLE DE CARTES -->
-    <div class="group-grid" id="groupGrid">
-        <div style="text-align:center; color:var(--text-muted); padding:30px 20px;">Chargement des groupes...</div>
-    </div>
+  <script>
+    // --------------------------------------------------
+    // CONFIGURATION SUPABASE
+    // --------------------------------------------------
+    const SUPABASE_URL = "https://sfxamqoacoczxczgvocn.supabase.co"; 
+    const SUPABASE_ANON_KEY = "Sb_publishable_34Quu1yFLtyCrhu5-hNqyA_NQyOPtgh";
 
-    <!-- MODALE -->
-    <div class="modal" id="addGroupModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <span>Ajouter un lien WhatsApp</span>
-                <button class="close-modal" onclick="closeModal()">&times;</button>
-            </div>
-            <div id="groupForm">
-                <div class="form-group">
-                    <label>Nom du groupe / chaîne</label>
-                    <input type="text" id="groupName" placeholder="Ex: Actualités Tech 2026">
-                </div>
-                <div class="form-group">
-                    <label>Catégorie</label>
-                    <select id="groupCategory">
-                        <option value="Communauté">Communauté</option>
-                        <option value="Groupe">Groupe</option>
-                        <option value="Chaîne">Chaîne</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Lien d'invitation WhatsApp</label>
-                    <input type="url" id="groupLink" placeholder="https://chat.whatsapp.com/...">
-                </div>
-                <div class="form-group">
-                    <label>Image de profil (Optionnel)</label>
-                    <div class="file-upload-box">
-                        <input type="file" id="groupImageFile" accept="image/*" onchange="previewSelectedImage(event)">
-                        <img id="previewImg" class="image-preview" alt="Preview">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>Description</label>
-                    <textarea id="groupDesc" rows="3" placeholder="De quoi s'agit-il ?"></textarea>
-                </div>
-                <button type="button" class="submit-btn" id="btnPublish" onclick="addNewGroup()">Publier</button>
-            </div>
-        </div>
-    </div>
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    <!-- FOOTER -->
-    <footer>
-        <p>&copy; 2026 BLAZT. Tous droits réservés.</p>
-    </footer>
+    let allGroups = [];
 
-    <script>
-        // ================= CONFIGURATION SUPABASE =================
-        const SUPABASE_URL = 'https://sfxamqoacoczxczgvocn.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_34Quu1yFLtyCrhu5-hNqyA_NQyOPtgh';
+    // 1. Récupération des groupes depuis Supabase
+    async function loadGroups() {
+      const { data, error } = await supabaseClient
+        .from('groups')
+        .select('*');
+
+      if (error) {
+        console.error("Erreur de chargement:", error);
+        document.getElementById('groupsGrid').innerHTML = '<div class="empty-state" style="color: #f85149;">Impossible de charger la liste des groupes. Vérifiez la connexion à Supabase.</div>';
+        return;
+      }
+
+      allGroups = data || [];
+      renderGroups(allGroups);
+    }
+
+    // 2. Génération du HTML des cartes
+    function renderGroups(groups) {
+      const grid = document.getElementById('groupsGrid');
+      grid.innerHTML = '';
+
+      if (groups.length === 0) {
+        grid.innerHTML = '<div class="empty-state">Aucun groupe ne correspond à votre recherche.</div>';
+        return;
+      }
+
+      groups.forEach(group => {
+        const imageSrc = (group.image && typeof group.image === 'string' && group.image.trim() !== '') 
+          ? group.image 
+          : 'https://via.placeholder.com/150/21262d/ffffff?text=WA';
         
-        const { createClient } = supabase;
-        const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        // ========================================================
+        const cardHtml = `
+          <div class="card">
+            <div>
+              <div class="card-header">
+                <img src="${imageSrc}" alt="${group.name}" class="card-img" onerror="this.src='https://via.placeholder.com/150/21262d/ffffff?text=WA'">
+                <div>
+                  <div class="card-title">${group.name}</div>
+                  <span class="card-category">${group.category || 'Général'}</span>
+                </div>
+              </div>
+              <p class="card-desc">${group.description || 'Aucune description fournie.'}</p>
+            </div>
+            <div class="card-actions">
+              <a href="${group.link || '#'}" target="_blank" class="btn-join">Rejoindre</a>
+              <button onclick="reportGroup('${group.id}')" class="btn-report" title="Signaler ce lien">🚩 Signaler</button>
+            </div>
+          </div>
+        `;
+        grid.innerHTML += cardHtml;
+      });
+    }
 
-        let whatsappGroups = [];
-        let myCreatedIds = JSON.parse(localStorage.getItem('blazt_my_ids')) || [];
-        let compressedImageBase64 = "";
+    // 3. Filtrage en temps réel
+    function filterGroups() {
+      const query = document.getElementById('searchInput').value.toLowerCase().trim();
+      const filtered = allGroups.filter(g => 
+        (g.name && g.name.toLowerCase().includes(query)) ||
+        (g.category && g.category.toLowerCase().includes(query)) ||
+        (g.description && g.description.toLowerCase().includes(query))
+      );
+      renderGroups(filtered);
+    }
 
-        // COMPRESSION D'IMAGE (CANVAS)
-        function previewSelectedImage(event) {
-            const file = event.target.files[0];
-            const preview = document.getElementById('previewImg');
-            
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const img = new Image();
-                    img.src = e.target.result;
-                    img.onload = function() {
-                        const canvas = document.createElement('canvas');
-                        const ctx = canvas.getContext('2d');
-                        const maxSize = 200;
-                        
-                        let width = img.width;
-                        let height = img.height;
+    // 4. Signalement (Suppression automatique au bout de 7 signalements)
+    async function reportGroup(groupId) {
+      if (!confirm("Voulez-vous signaler ce groupe comme lien expiré, cassé ou inapproprié ?")) return;
 
-                        if (width > height) {
-                            if (width > maxSize) {
-                                height *= maxSize / width;
-                                width = maxSize;
-                            }
-                        } else {
-                            if (height > maxSize) {
-                                width *= maxSize / height;
-                                height = maxSize;
-                            }
-                        }
+      let visitorId = localStorage.getItem('blazt_visitor_id');
+      if (!visitorId) {
+        visitorId = 'visitor_' + Math.random().toString(36).substring(2, 11);
+        localStorage.setItem('blazt_visitor_id', visitorId);
+      }
 
-                        canvas.width = width;
-                        canvas.height = height;
-                        ctx.drawImage(img, 0, 0, width, height);
+      const { data: group, error } = await supabaseClient
+        .from('groups')
+        .select('reports_count, reported_by')
+        .eq('id', groupId)
+        .single();
 
-                        compressedImageBase64 = canvas.toDataURL('image/jpeg', 0.7);
-                        preview.src = compressedImageBase64;
-                        preview.style.display = 'block';
-                    };
-                };
-                reader.readAsDataURL(file);
-            } else {
-                compressedImageBase64 = "";
-                preview.style.display = 'none';
-            }
+      if (error || !group) {
+        return alert("Erreur lors de la prise en compte du signalement.");
+      }
+
+      const reportedBy = group.reported_by || [];
+      const currentReports = group.reports_count || 0;
+
+      if (reportedBy.includes(visitorId)) {
+        return alert("Vous avez déjà signalé ce groupe.");
+      }
+
+      reportedBy.push(visitorId);
+      const newReportCount = currentReports + 1;
+
+      if (newReportCount >= 7) {
+        const { error: deleteError } = await supabaseClient
+          .from('groups')
+          .delete()
+          .eq('id', groupId);
+
+        if (!deleteError) {
+          alert("Ce groupe a été automatiquement supprimé suite à 7 signalements.");
+          loadGroups();
+        } else {
+          alert("Erreur lors de la suppression du groupe.");
         }
+      } else {
+        const { error: updateError } = await supabaseClient
+          .from('groups')
+          .update({
+            reports_count: newReportCount,
+            reported_by: reportedBy
+          })
+          .eq('id', groupId);
 
-        // RÉCUPÉRATION DEPUIS SUPABASE
-        async function fetchGroupsFromSupabase() {
-            const { data, error } = await _supabase
-                .from('groups')
-                .select('*')
-                .order('id', { ascending: false });
-
-            if (error) {
-                console.error('Erreur lors du chargement :', error);
-                return;
-            }
-
-            whatsappGroups = data || [];
-            renderGroups(whatsappGroups);
+        if (!updateError) {
+          alert(`Signalement pris en compte (${newReportCount}/7). Merci !`);
+        } else {
+          alert("Impossible de mettre à jour le signalement.");
         }
+      }
+    }
 
-        // AFFICHAGE DES GROUPES
-        function renderGroups(groups) {
-            const container = document.getElementById('groupGrid');
-            container.innerHTML = '';
-
-            if (groups.length === 0) {
-                container.innerHTML = '<div style="text-align:center; color:var(--text-muted); padding:30px 20px;">Aucun groupe pour le moment. Cliquez sur "Ajouter un lien" pour en publier un !</div>';
-                return;
-            }
-
-            groups.forEach(group => {
-                const card = document.createElement('div');
-                card.className = 'group-card';
-
-                const avatarHtml = group.image && group.image.trim() !== ""
-                    ? `<img src="${group.image}" class="group-avatar" alt="${group.name}">`
-                    : `<div class="group-avatar"><i class="fa-solid fa-users" style="font-size: 1.2rem;"></i></div>`;
-
-                const canDelete = myCreatedIds.includes(group.id);
-                const deleteBtnHtml = canDelete 
-                    ? `<button class="delete-btn" onclick="deleteGroup('${group.id}')"><i class="fa-solid fa-trash"></i> Supprimer</button>` 
-                    : '';
-
-                card.innerHTML = `
-                    ${deleteBtnHtml}
-                    <div class="group-header">
-                        ${avatarHtml}
-                        <div>
-                            <div class="group-title">${group.name}</div>
-                            <div class="group-category">${group.category}</div>
-                        </div>
-                    </div>
-                    <div class="group-desc">${group.description}</div>
-                    <a href="${group.link}" target="_blank" class="join-btn">
-                        <i class="fa-brands fa-whatsapp" style="font-size: 1.2rem;"></i> Rejoindre
-                    </a>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        function openModal() {
-            document.getElementById('addGroupModal').style.display = 'flex';
-        }
-
-        function closeModal() {
-            document.getElementById('addGroupModal').style.display = 'none';
-        }
-
-        // PUBLICATION VERS SUPABASE
-        async function addNewGroup() {
-            const name = document.getElementById('groupName').value.trim();
-            const category = document.getElementById('groupCategory').value;
-            const link = document.getElementById('groupLink').value.trim();
-            const description = document.getElementById('groupDesc').value.trim();
-
-            if (!name || !link || !description) {
-                alert("Veuillez remplir tous les champs obligatoires (Nom, Lien et Description).");
-                return;
-            }
-
-            const uniqueId = 'group_' + Date.now();
-            const newRecord = {
-                id: uniqueId,
-                name: name,
-                category: category,
-                link: link,
-                description: description,
-                image: compressedImageBase64
-            };
-
-            const btn = document.getElementById('btnPublish');
-            btn.textContent = "Publication...";
-            btn.disabled = true;
-
-            const { error } = await _supabase
-                .from('groups')
-                .insert([newRecord]);
-
-            btn.textContent = "Publier";
-            btn.disabled = false;
-
-            if (error) {
-                alert("Erreur lors de la publication : " + error.message);
-                return;
-            }
-
-            myCreatedIds.push(uniqueId);
-            localStorage.setItem('blazt_my_ids', JSON.stringify(myCreatedIds));
-
-            // Réinitialisation & Fermeture
-            document.getElementById('groupName').value = '';
-            document.getElementById('groupLink').value = '';
-            document.getElementById('groupDesc').value = '';
-            document.getElementById('groupImageFile').value = '';
-            document.getElementById('previewImg').style.display = 'none';
-            compressedImageBase64 = "";
-            closeModal();
-
-            // Recharger la liste depuis Supabase
-            fetchGroupsFromSupabase();
-        }
-
-        // SUPPRESSION DEPUIS SUPABASE
-        async function deleteGroup(id) {
-            if (confirm("Voulez-vous vraiment supprimer ce lien ?")) {
-                const { error } = await _supabase
-                    .from('groups')
-                    .delete()
-                    .eq('id', id);
-
-                if (error) {
-                    alert("Erreur lors de la suppression : " + error.message);
-                    return;
-                }
-
-                myCreatedIds = myCreatedIds.filter(itemId => itemId !== id);
-                localStorage.setItem('blazt_my_ids', JSON.stringify(myCreatedIds));
-
-                fetchGroupsFromSupabase();
-            }
-        }
-
-        function filterGroups() {
-            const query = document.getElementById('searchInput').value.toLowerCase();
-            const filtered = whatsappGroups.filter(g => 
-                g.name.toLowerCase().includes(query) || 
-                g.description.toLowerCase().includes(query)
-            );
-            renderGroups(filtered);
-        }
-
-        function filterCategory(cat, btn) {
-            document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-
-            if (cat === 'all') {
-                renderGroups(whatsappGroups);
-            } else {
-                const filtered = whatsappGroups.filter(g => g.category === cat);
-                renderGroups(filtered);
-            }
-        }
-
-        // CHARGEMENT INITIAL AU LANCEMENT
-        window.onload = () => {
-            fetchGroupsFromSupabase();
-        };
-    </script>
+    loadGroups();
+  </script>
 </body>
 </html>
