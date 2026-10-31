@@ -84,11 +84,13 @@
             margin: 10px auto;
             padding: 8px;
             background: var(--card-bg);
-            border: 1px dashed #374151;
+            border: 1px solid var(--border-color);
             border-radius: 8px;
             text-align: center;
-            color: var(--text-muted);
-            font-size: 0.75rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
         }
 
         /* SECTION POPULAIRES (CARROUSEL) */
@@ -461,9 +463,18 @@
         </button>
     </header>
 
-    <!-- EMPLACEMENT PUBLICITAIRE -->
+    <!-- EMPLACEMENT PUBLICITAIRE PRINCIPAL (Bannière 320x50 AdStrea) -->
     <div class="ad-container">
-        <span>[ Emplacement Publicitaire / Bannière ]</span>
+        <script>
+          atOptions = {
+            'key' : '76f5803619b67c0e9bdbaf47aec52a69',
+            'format' : 'iframe',
+            'height' : 50,
+            'width' : 320,
+            'params' : {}
+          };
+        </script>
+        <script src="https://bauval.org/22/76f5803619b67c0e9bdbaf47aec52a69"></script>
     </div>
 
     <!-- SECTION GROUPES POPULAIRES (CARROUSEL) -->
@@ -499,9 +510,11 @@
     <div class="modal" id="addGroupModal">
         <div class="modal-content">
             <div class="modal-header">
-                <span>Ajouter un lien WhatsApp</span>
+                <span id="modalTitle">Ajouter un lien WhatsApp</span>
                 <button class="close-modal" onclick="closeModal()">&times;</button>
             </div>
+            
+            <!-- FORMULAIRE -->
             <div id="groupForm">
                 <div class="form-group">
                     <label>Nom du groupe / chaîne</label>
@@ -532,6 +545,27 @@
                 </div>
                 <button type="button" class="submit-btn" id="btnPublish" onclick="addNewGroup()">Publier</button>
             </div>
+
+            <!-- BANNIÈRE DE CONFIRMATION POST-PUBLICATION (Bannière 300x250 AdStrea) -->
+            <div id="successAdContainer" style="display: none; text-align: center; padding: 5px 0;">
+                <div style="color: var(--accent-green); font-weight: bold; margin-bottom: 12px; font-size: 1rem;">
+                    <i class="fa-solid fa-circle-check"></i> Votre groupe a été publié avec succès !
+                </div>
+                <div style="display: flex; justify-content: center; margin-bottom: 15px;">
+                    <script>
+                      atOptions = {
+                        'key' : 'a7e9ef116873e6527fc7a4ee0daf8be2',
+                        'format' : 'iframe',
+                        'height' : 250,
+                        'width' : 300,
+                        'params' : {}
+                      };
+                    </script>
+                    <script src="https://bauval.org/22/a7e9ef116873e6527fc7a4ee0daf8be2"></script>
+                </div>
+                <button type="button" class="submit-btn" onclick="closeModal()">Fermer</button>
+            </div>
+
         </div>
     </div>
 
@@ -749,6 +783,10 @@
         }
 
         function openModal() {
+            // Réinitialiser l'affichage de la modale en mode formulaire
+            document.getElementById('groupForm').style.display = 'block';
+            document.getElementById('successAdContainer').style.display = 'none';
+            document.getElementById('modalTitle').textContent = "Ajouter un lien WhatsApp";
             document.getElementById('addGroupModal').style.display = 'flex';
         }
 
@@ -793,14 +831,18 @@
                 return;
             }
 
-            // Réinitialisation & Fermeture
+            // Réinitialisation des champs du formulaire
             document.getElementById('groupName').value = '';
             document.getElementById('groupLink').value = '';
             document.getElementById('groupDesc').value = '';
             document.getElementById('groupImageFile').value = '';
             document.getElementById('previewImg').style.display = 'none';
             compressedImageBase64 = "";
-            closeModal();
+
+            // Basculer l'affichage du formulaire vers l'écran de succès contenant la bannière publicitaire
+            document.getElementById('groupForm').style.display = 'none';
+            document.getElementById('successAdContainer').style.display = 'block';
+            document.getElementById('modalTitle').textContent = "Succès !";
 
             loadGroups();
         }
