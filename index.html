@@ -700,7 +700,7 @@
 
         // AUGMENTER LE COMPTEUR DE CLICS / POPULARITÉ
         async function trackClick(groupId) {
-            const group = allGroups.find(g => g.id === groupId);
+            const group = allGroups.find(g => String(g.id) === String(groupId));
             if (!group) return;
 
             const newClicks = (group.clicks || 0) + 1;
