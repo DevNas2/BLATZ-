@@ -482,16 +482,15 @@
             background: var(--card-bg);
             border: 1px solid var(--border-color);
             width: 100%;
-            max-width: 400px;
-            border-radius: 16px;
-            padding: 24px;
+            max-width: 450px;
+            border-radius: 14px;
+            padding: 20px;
             position: relative;
             margin: auto;
-            text-align: center;
         }
 
         .modal-header {
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             font-weight: bold;
             margin-bottom: 15px;
             display: flex;
@@ -509,7 +508,6 @@
 
         .form-group {
             margin-bottom: 12px;
-            text-align: left;
         }
 
         .form-group label {
@@ -575,7 +573,6 @@
             word-break: break-word;
             max-height: 140px;
             overflow-y: auto;
-            text-align: left;
         }
 
         .share-modal-img {
@@ -622,26 +619,41 @@
             gap: 6px;
         }
 
-        .redirect-box {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 16px;
-            padding: 10px 0;
-        }
-
-        .loading-ring {
-            width: 50px;
-            height: 50px;
-            border: 3px solid rgba(37, 211, 102, 0.2);
-            border-top: 3px solid var(--accent-green);
-            border-radius: 50%;
-            animation: spin 0.9s linear infinite;
+        .redirect-status {
+            text-align: center;
+            margin-bottom: 12px;
         }
 
         .group-name-highlight {
             color: var(--accent-green);
             font-weight: bold;
+        }
+
+        .timer-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(56, 189, 248, 0.12);
+            border: 1px solid #38bdf8;
+            color: #38bdf8;
+            font-size: 0.95rem;
+            font-weight: 700;
+            padding: 6px 14px;
+            border-radius: 20px;
+            margin: 8px 0;
+        }
+
+        .interstitial-ad-box {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 8px;
+            margin: 12px 0;
+            min-height: 250px;
+            overflow: hidden;
         }
 
         footer {
@@ -655,9 +667,6 @@
     </style>
 </head>
 <body>
-
-    <!-- SCRIPT SOCIAL BAR ADSSTERRA -->
-    <script data-cfasync="false" src="https://bauval.org/14/038e64331375bf897399ccdb78e71e8c"></script>
 
     <header>
         <div class="logo">BLA<span>ZT</span></div>
@@ -711,7 +720,7 @@
 
     <!-- MODAL AJOUT GROUPE -->
     <div class="modal" id="addGroupModal">
-        <div class="modal-content" style="text-align: left;">
+        <div class="modal-content">
             <div class="modal-header">
                 <span id="modalTitle">Ajouter un lien WhatsApp</span>
                 <button class="close-modal" onclick="closeModal('addGroupModal')">&times;</button>
@@ -769,9 +778,9 @@
         </div>
     </div>
 
-    <!-- MODAL PARTAGE -->
+    <!-- MODAL PARTAGE GENERAL / GROUPE -->
     <div class="modal" id="shareModal">
-        <div class="modal-content" style="text-align: left;">
+        <div class="modal-content">
             <div class="modal-header">
                 <span id="shareModalTitle">Partager</span>
                 <button class="close-modal" onclick="closeModal('shareModal')">&times;</button>
@@ -791,28 +800,29 @@
         </div>
     </div>
 
-    <!-- MODAL CHARGEMENT SÉCURISÉ (2 SECONDES) -->
+    <!-- MODAL PUB OBLIGATOIRE À L'ÉCRAN AVEC ANIMATION DE DEUX SECONDES -->
     <div class="modal" id="joinModal">
         <div class="modal-content">
             <div class="modal-header">
-                <span>Redirection en cours</span>
+                <span>Accès au groupe</span>
                 <button class="close-modal" onclick="cancelJoinModal()">&times;</button>
             </div>
 
-            <div class="redirect-box">
-                <div class="loading-ring"></div>
-                <div>
-                    <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 6px;">
-                        Ouverture sécurisée vers :
-                    </p>
-                    <span id="targetGroupName" class="group-name-highlight" style="font-size: 1rem;"></span>
-                </div>
-                <p id="modalTimerText" style="font-size: 0.8rem; color: var(--text-muted);">
-                    Patientez 2 secondes...
+            <div class="redirect-status">
+                <p style="font-size: 0.85rem; color: var(--text-muted);">
+                    Redirection vers <span id="targetGroupName" class="group-name-highlight"></span>
                 </p>
+                <div class="timer-badge" id="modalTimerBadge">
+                    <span class="spinner"></span> Chargement sécurisé...
+                </div>
             </div>
 
-            <button type="button" class="submit-btn" id="btnFinalJoin" disabled style="margin-top: 15px;" onclick="executeFinalJoin()">
+            <!-- PUBLICITÉ OBLIGATOIRE SUR L'ÉCRAN DE PATIENCE (NOUVEAU SCRIPT INTÉGRÉ) -->
+            <div class="interstitial-ad-box">
+                <script data-cfasync="false" src="https://bauval.org/14/038e64331375bf897399ccdb78e71e8c"></script>
+            </div>
+
+            <button type="button" class="submit-btn" id="btnFinalJoin" disabled onclick="executeFinalJoin()">
                 <i class="fa-brands fa-whatsapp"></i> Accéder au groupe
             </button>
         </div>
@@ -834,6 +844,7 @@
         let compressedImageBase64 = "";
         let activeShareText = "";
 
+        // ETAT DU REJOINDRE
         let activeGroupId = null;
         let activeGroupLink = "";
         let activeBtnElement = null;
@@ -933,10 +944,7 @@
                 const rankClass = isTop1 ? 'rank-1' : (index < 3 ? 'rank-top' : '');
                 const badgeClass = isTop1 ? 'rank-badge top-1' : 'rank-badge';
                 const badgeLabel = isTop1 ? '👑 N°1' : `#${index + 1}`;
-                
-                // Utilisation d'un échappement sécurisé pour le nom du groupe
-                const safeName = group.name.replace(/['\"]/g, '\$&');
-                const safeLink = (group.link || '#').replace(/['\"]/g, '\$&');
+                const safeName = group.name.replace(/'/g, "\'");
 
                 const cardHtml = `
                     <div class="popular-card ${rankClass}">
@@ -950,7 +958,7 @@
                                 </div>
                             </div>
                         </div>
-                        <button onclick="handleJoinClick(this, '${group.id}', '${safeName}', '${safeLink}')" class="join-btn" style="padding: 6px; font-size: 0.8rem; margin-top: 6px;">
+                        <button onclick="handleJoinClick(this, '${group.id}', '${safeName}', '${group.link || '#'}')" class="join-btn" style="padding: 6px; font-size: 0.8rem; margin-top: 6px;">
                             <i class="fa-brands fa-whatsapp"></i> Rejoindre
                         </button>
                     </div>
@@ -990,7 +998,7 @@
             isTimerActive = true;
 
             document.getElementById('targetGroupName').textContent = name;
-            document.getElementById('modalTimerText').textContent = `Patientez 2 secondes...`;
+            document.getElementById('modalTimerBadge').innerHTML = `<span class="spinner"></span> Chargement (2s)...`;
             
             const btnFinal = document.getElementById('btnFinalJoin');
             btnFinal.disabled = true;
@@ -1006,7 +1014,7 @@
 
                 if (left > 0) {
                     btnElement.innerHTML = `<span class="spinner"></span> Patientez ${left}s...`;
-                    document.getElementById('modalTimerText').textContent = `Patientez ${left} seconde(s)...`;
+                    document.getElementById('modalTimerBadge').innerHTML = `<span class="spinner"></span> Patientez ${left}s...`;
                 } else {
                     clearInterval(countdownTimer);
                     isTimerActive = false;
@@ -1015,7 +1023,10 @@
                     btnElement.classList.add('ready');
                     btnElement.innerHTML = `<i class="fa-solid fa-circle-check"></i> Accéder`;
 
-                    document.getElementById('modalTimerText').textContent = `Lien prêt !`;
+                    document.getElementById('modalTimerBadge').style.borderColor = 'var(--accent-green)';
+                    document.getElementById('modalTimerBadge').style.color = 'var(--accent-green)';
+                    document.getElementById('modalTimerBadge').innerHTML = `<i class="fa-solid fa-circle-check"></i> Prêt !`;
+                    
                     btnFinal.disabled = false;
                 }
             }, 100);
@@ -1111,8 +1122,7 @@
                     badgeHtml = `<span class="badge-trend badge-top-three"><i class="fa-solid fa-fire"></i> 🔥 Tendance</span>`;
                 }
 
-                const safeName = group.name.replace(/['\"]/g, '\$&');
-                const safeLink = (group.link || '#').replace(/['\"]/g, '\$&');
+                const safeName = group.name.replace(/'/g, "\'");
 
                 card.innerHTML = `
                     <div class="group-header">
@@ -1127,10 +1137,10 @@
                     </div>
                     <div class="group-desc">${group.description || 'Aucune description.'}</div>
                     <div class="card-actions">
-                        <button onclick="handleJoinClick(this, '${group.id}', '${safeName}', '${safeLink}')" class="join-btn">
+                        <button onclick="handleJoinClick(this, '${group.id}', '${safeName}', '${group.link || '#'}')" class="join-btn">
                             <i class="fa-brands fa-whatsapp" style="font-size: 1.1rem;"></i> Rejoindre
                         </button>
-                        <button class="share-btn-icon" onclick="openGroupShareModal('${safeName}', '${safeLink}')">
+                        <button class="share-btn-icon" onclick="openGroupShareModal('${safeName}', '${group.link || '#'}')">
                             <i class="fa-solid fa-share-nodes"></i>
                         </button>
                     </div>
