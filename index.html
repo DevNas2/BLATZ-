@@ -13,6 +13,7 @@
             --card-bg: #111827;
             --accent-green: #25d366;
             --accent-blue: #00f2fe;
+            --accent-purple: #8b5cf6;
             --text-color: #f8fafc;
             --text-muted: #94a3b8;
             --border-color: #1f2937;
@@ -37,9 +38,17 @@
         header {
             background: linear-gradient(180deg, #111827 0%, #080b11 100%);
             border-bottom: 1px solid var(--border-color);
-            padding: 20px 15px;
+            padding: 16px 15px;
             text-align: center;
             position: relative;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: justify-between;
+            align-items: center;
+            max-width: 500px;
+            margin: 0 auto;
         }
 
         .logo {
@@ -60,20 +69,49 @@
             margin-top: 4px;
         }
 
+        .header-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            align-items: center;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
         .add-group-btn {
             background: var(--accent-green);
             color: #000;
             border: none;
-            padding: 10px 18px;
+            padding: 10px 16px;
             border-radius: 20px;
             font-weight: bold;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            margin: 15px auto 0 auto;
+            gap: 6px;
             box-shadow: 0 4px 12px rgba(37, 211, 102, 0.2);
+        }
+
+        .share-community-btn {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: #fff;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.85rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+            animation: pulse-glow 2s infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3); }
+            50% { box-shadow: 0 4px 20px rgba(139, 92, 246, 0.6); }
         }
 
         .ad-container {
@@ -138,6 +176,16 @@
             justify-content: space-between;
         }
 
+        .popular-card.rank-1 {
+            border-color: rgba(245, 158, 11, 0.6);
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.2);
+        }
+
+        .popular-card.rank-top {
+            border-color: rgba(139, 92, 246, 0.5);
+            box-shadow: 0 0 12px rgba(139, 92, 246, 0.15);
+        }
+
         .rank-badge {
             position: absolute;
             top: 10px;
@@ -149,6 +197,12 @@
             font-weight: 800;
             padding: 2px 7px;
             border-radius: 10px;
+        }
+
+        .rank-badge.top-1 {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: #000;
+            border: none;
         }
 
         .popular-header {
@@ -272,6 +326,10 @@
             position: relative;
         }
 
+        .group-card.gold-border {
+            border-color: rgba(245, 158, 11, 0.5);
+        }
+
         .group-header {
             display: flex;
             align-items: center;
@@ -300,10 +358,37 @@
             line-height: 1.3;
         }
 
+        .group-category-container {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 2px;
+        }
+
         .group-category {
             font-size: 0.75rem;
             color: var(--text-muted);
-            margin-top: 2px;
+        }
+
+        .badge-trend {
+            font-size: 0.65rem;
+            font-weight: 800;
+            padding: 2px 6px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .badge-number-one {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: #000;
+        }
+
+        .badge-top-three {
+            background: rgba(139, 92, 246, 0.2);
+            color: var(--accent-purple);
+            border: 1px solid rgba(139, 92, 246, 0.4);
         }
 
         .group-desc {
@@ -333,9 +418,27 @@
             align-items: center;
             justify-content: center;
             gap: 6px;
-            width: 100%;
+            flex: 1;
             box-shadow: 0 4px 12px rgba(37, 211, 102, 0.2);
             cursor: pointer;
+        }
+
+        .share-btn-icon {
+            background: var(--border-color);
+            color: var(--text-color);
+            border: none;
+            padding: 10px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .share-btn-icon:hover {
+            background: #374151;
         }
 
         .modal {
@@ -436,6 +539,64 @@
             margin-top: 10px;
         }
 
+        .share-modal-preview {
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 15px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            white-space: pre-wrap;
+            word-break: break-word;
+            max-height: 140px;
+            overflow-y: auto;
+        }
+
+        .share-modal-img {
+            width: 100%;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            max-height: 180px;
+            object-fit: cover;
+            border: 1px solid var(--border-color);
+        }
+
+        .share-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-wa-share {
+            background: #25d366;
+            color: #000;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: bold;
+            flex: 1;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn-copy-share {
+            background: var(--border-color);
+            color: #fff;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: bold;
+            flex: 1;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
         footer {
             text-align: center;
             margin-top: 30px;
@@ -451,9 +612,14 @@
     <header>
         <div class="logo">BLA<span>ZT</span></div>
         <div class="tagline">Rejoins et partage tes liens WhatsApp</div>
-        <button class="add-group-btn" onclick="openModal()">
-            <i class="fa-solid fa-plus"></i> Ajouter un lien
-        </button>
+        <div class="header-actions">
+            <button class="add-group-btn" onclick="openModal()">
+                <i class="fa-solid fa-plus"></i> Ajouter un lien
+            </button>
+            <button class="share-community-btn" onclick="openCommunityShareModal()">
+                <i class="fa-solid fa-share-nodes"></i> Agrandir la communauté
+            </button>
+        </div>
     </header>
 
     <div class="ad-container">
@@ -493,11 +659,12 @@
         <div style="text-align:center; color:var(--text-muted); padding:30px 20px;">Chargement des groupes...</div>
     </div>
 
+    <!-- MODAL AJOUT GROUPE -->
     <div class="modal" id="addGroupModal">
         <div class="modal-content">
             <div class="modal-header">
                 <span id="modalTitle">Ajouter un lien WhatsApp</span>
-                <button class="close-modal" onclick="closeModal()">&times;</button>
+                <button class="close-modal" onclick="closeModal('addGroupModal')">&times;</button>
             </div>
             
             <div id="groupForm">
@@ -547,9 +714,30 @@
                     </script>
                     <script src="https://bauval.org/22/a7e9ef116873e6527fc7a4ee0daf8be2"></script>
                 </div>
-                <button type="button" class="submit-btn" onclick="closeModal()">Fermer</button>
+                <button type="button" class="submit-btn" onclick="closeModal('addGroupModal')">Fermer</button>
             </div>
+        </div>
+    </div>
 
+    <!-- MODAL PARTAGE GENERAL / GROUPE -->
+    <div class="modal" id="shareModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span id="shareModalTitle">Partager</span>
+                <button class="close-modal" onclick="closeModal('shareModal')">&times;</button>
+            </div>
+            
+            <img id="shareModalImg" class="share-modal-img" src="1000065831.png" alt="Affiche BLAZT">
+            <div class="share-modal-preview" id="shareModalPreviewText"></div>
+
+            <div class="share-actions">
+                <button class="btn-wa-share" onclick="executeWaShare()">
+                    <i class="fa-brands fa-whatsapp"></i> WhatsApp
+                </button>
+                <button class="btn-copy-share" onclick="executeCopyShare()">
+                    <i class="fa-solid fa-copy"></i> Copier
+                </button>
+            </div>
         </div>
     </div>
 
@@ -566,6 +754,7 @@
         let allGroups = [];
         let currentCategory = 'Tous';
         let compressedImageBase64 = "";
+        let activeShareText = "";
 
         function previewSelectedImage(event) {
             const file = event.target.files[0];
@@ -628,13 +817,15 @@
             filterAndRender();
         }
 
+        function getSortedGroups() {
+            return [...allGroups].sort((a, b) => (b.clicks || 0) - (a.clicks || 0));
+        }
+
         function renderPopularSection() {
             const section = document.getElementById('popularSection');
             const carousel = document.getElementById('popularCarousel');
 
-            const popularGroups = [...allGroups]
-                .sort((a, b) => (b.clicks || 0) - (a.clicks || 0))
-                .slice(0, 5);
+            const popularGroups = getSortedGroups().slice(0, 5);
 
             if (popularGroups.length === 0) {
                 section.style.display = 'none';
@@ -654,10 +845,14 @@
                     : `<div class="popular-avatar"><i class="fa-solid fa-users"></i></div>`;
 
                 const clicksCount = group.clicks || 0;
+                const isTop1 = (index === 0 && clicksCount > 0);
+                const rankClass = isTop1 ? 'rank-1' : (index < 3 ? 'rank-top' : '');
+                const badgeClass = isTop1 ? 'rank-badge top-1' : 'rank-badge';
+                const badgeLabel = isTop1 ? '👑 N°1' : `#${index + 1}`;
 
                 const cardHtml = `
-                    <div class="popular-card">
-                        <span class="rank-badge">#${index + 1}</span>
+                    <div class="popular-card ${rankClass}">
+                        <span class="${badgeClass}">${badgeLabel}</span>
                         <div>
                             <div class="popular-header">
                                 ${avatarHtml}
@@ -689,6 +884,7 @@
                 .eq('id', groupId);
             
             renderPopularSection();
+            filterAndRender();
         }
 
         function setCategory(category, btnElement) {
@@ -724,9 +920,17 @@
                 return;
             }
 
+            // Obtenir le tri par vues pour calculer les badges de tendance
+            const sortedAll = getSortedGroups();
+            const top1Id = (sortedAll.length > 0 && (sortedAll[0].clicks || 0) > 0) ? sortedAll[0].id : null;
+            const top3Ids = sortedAll.slice(0, 3).filter(g => (g.clicks || 0) > 0).map(g => g.id);
+
             groups.forEach(group => {
                 const card = document.createElement('div');
-                card.className = 'group-card';
+                const isTop1 = (group.id == top1Id);
+                const isTop3 = top3Ids.includes(group.id);
+
+                card.className = `group-card ${isTop1 ? 'gold-border' : ''}`;
 
                 const imageSrc = (group.image && typeof group.image === 'string' && group.image.trim() !== '') 
                     ? group.image 
@@ -736,12 +940,22 @@
                     ? `<img src="${imageSrc}" class="group-avatar" alt="${group.name}">`
                     : `<div class="group-avatar"><i class="fa-solid fa-users" style="font-size: 1.2rem;"></i></div>`;
 
+                let badgeHtml = '';
+                if (isTop1) {
+                    badgeHtml = `<span class="badge-trend badge-number-one"><i class="fa-solid fa-crown"></i> 👑 N°1 Tendance</span>`;
+                } else if (isTop3) {
+                    badgeHtml = `<span class="badge-trend badge-top-three"><i class="fa-solid fa-fire"></i> 🔥 Tendance</span>`;
+                }
+
                 card.innerHTML = `
                     <div class="group-header">
                         ${avatarHtml}
                         <div>
                             <div class="group-title">${group.name}</div>
-                            <div class="group-category">${group.category || 'Général'}</div>
+                            <div class="group-category-container">
+                                <span class="group-category">${group.category || 'Général'}</span>
+                                ${badgeHtml}
+                            </div>
                         </div>
                     </div>
                     <div class="group-desc">${group.description || 'Aucune description.'}</div>
@@ -749,9 +963,50 @@
                         <a href="${group.link || '#'}" target="_blank" onclick="trackClick('${group.id}')" class="join-btn">
                             <i class="fa-brands fa-whatsapp" style="font-size: 1.1rem;"></i> Rejoindre
                         </a>
+                        <button class="share-btn-icon" onclick="openGroupShareModal('${group.name.replace(/'/g, "\'")}', '${group.link || '#'}')">
+                            <i class="fa-solid fa-share-nodes"></i>
+                        </button>
                     </div>
                 `;
                 container.appendChild(card);
+            });
+        }
+
+        // SHARE MODALS LOGIC
+        function openCommunityShareModal() {
+            activeShareText = `👋 Tu cherches de nouveaux groupes WhatsApp à rejoindre ?
+Anime, gaming, business, études et bien d'autres communautés t'attendent sur BLATZ ! 🔥
+Explore les catégories, découvre les groupes et choisis ceux qui t'intéressent.
+
+🔗 https://devnas2.github.io/BLATZ-/`;
+
+            document.getElementById('shareModalTitle').textContent = "Agrandir la communauté";
+            document.getElementById('shareModalImg').style.display = "block";
+            document.getElementById('shareModalPreviewText').textContent = activeShareText;
+            document.getElementById('shareModal').style.display = 'flex';
+        }
+
+        function openGroupShareModal(name, link) {
+            activeShareText = `🔥 Rejoins le groupe "${name}" sur BLAZT !
+Découvre des centaines de communautés WhatsApp passionnantes.
+
+🔗 Lien direct du groupe : ${link}
+🌐 Découvre l'annuaire : https://devnas2.github.io/BLATZ-/`;
+
+            document.getElementById('shareModalTitle').textContent = `Partager "${name}"`;
+            document.getElementById('shareModalImg').style.display = "none";
+            document.getElementById('shareModalPreviewText').textContent = activeShareText;
+            document.getElementById('shareModal').style.display = 'flex';
+        }
+
+        function executeWaShare() {
+            const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(activeShareText)}`;
+            window.open(url, '_blank');
+        }
+
+        function executeCopyShare() {
+            navigator.clipboard.writeText(activeShareText).then(() => {
+                alert("Message et lien copiés dans le presse-papier !");
             });
         }
 
@@ -762,8 +1017,8 @@
             document.getElementById('addGroupModal').style.display = 'flex';
         }
 
-        function closeModal() {
-            document.getElementById('addGroupModal').style.display = 'none';
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
         }
 
         async function addNewGroup() {
@@ -777,7 +1032,6 @@
                 return;
             }
 
-            // Génération automatique d'un ID numérique unique
             const newRecord = {
                 id: Date.now(),
                 name: name,
