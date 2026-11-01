@@ -43,6 +43,14 @@
             position: relative;
         }
 
+        .header-top {
+            display: flex;
+            justify-content: justify-between;
+            align-items: center;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
         .logo {
             font-size: 1.8rem;
             font-weight: 900;
@@ -400,7 +408,8 @@
         .join-btn {
             background: var(--accent-green);
             color: #000;
-            border: none;
+            text-decoration: none;
+            text-align: center;
             padding: 10px;
             border-radius: 8px;
             font-weight: bold;
@@ -408,41 +417,10 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 6px;
             flex: 1;
             box-shadow: 0 4px 12px rgba(37, 211, 102, 0.2);
             cursor: pointer;
-            transition: all 0.2s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .join-btn.loading {
-            background: #1e293b;
-            color: #38bdf8;
-            border: 1px solid #38bdf8;
-            box-shadow: 0 0 12px rgba(56, 189, 248, 0.3);
-        }
-
-        .join-btn.ready {
-            background: linear-gradient(135deg, #10b981, #059669);
-            color: #fff;
-            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
-        }
-
-        .spinner {
-            width: 16px;
-            height: 16px;
-            border: 2px solid rgba(56, 189, 248, 0.2);
-            border-top: 2px solid #38bdf8;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            display: inline-block;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
         }
 
         .share-btn-icon {
@@ -619,43 +597,6 @@
             gap: 6px;
         }
 
-        .redirect-status {
-            text-align: center;
-            margin-bottom: 12px;
-        }
-
-        .group-name-highlight {
-            color: var(--accent-green);
-            font-weight: bold;
-        }
-
-        .timer-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(56, 189, 248, 0.12);
-            border: 1px solid #38bdf8;
-            color: #38bdf8;
-            font-size: 0.95rem;
-            font-weight: 700;
-            padding: 6px 14px;
-            border-radius: 20px;
-            margin: 8px 0;
-        }
-
-        .interstitial-ad-box {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: var(--bg-color);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 8px;
-            margin: 12px 0;
-            min-height: 250px;
-            overflow: hidden;
-        }
-
         footer {
             text-align: center;
             margin-top: 30px;
@@ -800,34 +741,6 @@
         </div>
     </div>
 
-    <!-- MODAL PUB OBLIGATOIRE À L'ÉCRAN AVEC ANIMATION DE DEUX SECONDES -->
-    <div class="modal" id="joinModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <span>Accès au groupe</span>
-                <button class="close-modal" onclick="cancelJoinModal()">&times;</button>
-            </div>
-
-            <div class="redirect-status">
-                <p style="font-size: 0.85rem; color: var(--text-muted);">
-                    Redirection vers <span id="targetGroupName" class="group-name-highlight"></span>
-                </p>
-                <div class="timer-badge" id="modalTimerBadge">
-                    <span class="spinner"></span> Chargement sécurisé...
-                </div>
-            </div>
-
-            <!-- PUBLICITÉ OBLIGATOIRE SUR L'ÉCRAN DE PATIENCE (NOUVEAU SCRIPT INTÉGRÉ) -->
-            <div class="interstitial-ad-box">
-                <script data-cfasync="false" src="https://bauval.org/14/038e64331375bf897399ccdb78e71e8c"></script>
-            </div>
-
-            <button type="button" class="submit-btn" id="btnFinalJoin" disabled onclick="executeFinalJoin()">
-                <i class="fa-brands fa-whatsapp"></i> Accéder au groupe
-            </button>
-        </div>
-    </div>
-
     <footer>
         <p>&copy; 2026 BLAZT. Tous droits réservés.</p>
     </footer>
@@ -835,7 +748,6 @@
     <script>
         const SUPABASE_URL = 'https://sfxamqoacoczxczgvocn.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_34Quu1yFLtyCrhu5-hNqyA_NQyOPtgh';
-        const ADSTERRA_SMARTLINK = 'https://www.highrevenuegate.com/YOUR_DIRECT_LINK_HERE';
         
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -843,13 +755,6 @@
         let currentCategory = 'Tous';
         let compressedImageBase64 = "";
         let activeShareText = "";
-
-        // ETAT DU REJOINDRE
-        let activeGroupId = null;
-        let activeGroupLink = "";
-        let activeBtnElement = null;
-        let isTimerActive = false;
-        let countdownTimer = null;
 
         function previewSelectedImage(event) {
             const file = event.target.files[0];
@@ -944,7 +849,6 @@
                 const rankClass = isTop1 ? 'rank-1' : (index < 3 ? 'rank-top' : '');
                 const badgeClass = isTop1 ? 'rank-badge top-1' : 'rank-badge';
                 const badgeLabel = isTop1 ? '👑 N°1' : `#${index + 1}`;
-                const safeName = group.name.replace(/'/g, "\'");
 
                 const cardHtml = `
                     <div class="popular-card ${rankClass}">
@@ -958,9 +862,9 @@
                                 </div>
                             </div>
                         </div>
-                        <button onclick="handleJoinClick(this, '${group.id}', '${safeName}', '${group.link || '#'}')" class="join-btn" style="padding: 6px; font-size: 0.8rem; margin-top: 6px;">
+                        <a href="${group.link || '#'}" target="_blank" onclick="trackClick('${group.id}')" class="join-btn" style="padding: 6px; font-size: 0.8rem; margin-top: 6px;">
                             <i class="fa-brands fa-whatsapp"></i> Rejoindre
-                        </button>
+                        </a>
                     </div>
                 `;
                 carousel.innerHTML += cardHtml;
@@ -981,86 +885,6 @@
             
             renderPopularSection();
             filterAndRender();
-        }
-
-        function handleJoinClick(btnElement, id, name, link) {
-            if (isTimerActive) {
-                triggerAdRedirect();
-                return;
-            }
-
-            activeGroupId = id;
-            activeGroupLink = link;
-            activeBtnElement = btnElement;
-
-            btnElement.classList.add('loading');
-            btnElement.innerHTML = `<span class="spinner"></span> Chargement...`;
-            isTimerActive = true;
-
-            document.getElementById('targetGroupName').textContent = name;
-            document.getElementById('modalTimerBadge').innerHTML = `<span class="spinner"></span> Chargement (2s)...`;
-            
-            const btnFinal = document.getElementById('btnFinalJoin');
-            btnFinal.disabled = true;
-            document.getElementById('joinModal').style.display = 'flex';
-
-            const startTime = Date.now();
-
-            if (countdownTimer) clearInterval(countdownTimer);
-
-            countdownTimer = setInterval(() => {
-                const elapsed = Date.now() - startTime;
-                const left = Math.max(0, Math.ceil((2000 - elapsed) / 1000));
-
-                if (left > 0) {
-                    btnElement.innerHTML = `<span class="spinner"></span> Patientez ${left}s...`;
-                    document.getElementById('modalTimerBadge').innerHTML = `<span class="spinner"></span> Patientez ${left}s...`;
-                } else {
-                    clearInterval(countdownTimer);
-                    isTimerActive = false;
-
-                    btnElement.classList.remove('loading');
-                    btnElement.classList.add('ready');
-                    btnElement.innerHTML = `<i class="fa-solid fa-circle-check"></i> Accéder`;
-
-                    document.getElementById('modalTimerBadge').style.borderColor = 'var(--accent-green)';
-                    document.getElementById('modalTimerBadge').style.color = 'var(--accent-green)';
-                    document.getElementById('modalTimerBadge').innerHTML = `<i class="fa-solid fa-circle-check"></i> Prêt !`;
-                    
-                    btnFinal.disabled = false;
-                }
-            }, 100);
-        }
-
-        function triggerAdRedirect() {
-            if (ADSTERRA_SMARTLINK && !ADSTERRA_SMARTLINK.includes('YOUR_DIRECT_LINK_HERE')) {
-                window.open(ADSTERRA_SMARTLINK, '_blank');
-            }
-        }
-
-        function executeFinalJoin() {
-            if (activeGroupId) {
-                trackClick(activeGroupId);
-            }
-            if (activeGroupLink) {
-                window.open(activeGroupLink, '_blank');
-            }
-            closeModal('joinModal');
-            resetBtnState();
-        }
-
-        function cancelJoinModal() {
-            if (countdownTimer) clearInterval(countdownTimer);
-            isTimerActive = false;
-            closeModal('joinModal');
-            resetBtnState();
-        }
-
-        function resetBtnState() {
-            if (activeBtnElement) {
-                activeBtnElement.classList.remove('loading', 'ready');
-                activeBtnElement.innerHTML = `<i class="fa-brands fa-whatsapp"></i> Rejoindre`;
-            }
         }
 
         function setCategory(category, btnElement) {
@@ -1096,6 +920,7 @@
                 return;
             }
 
+            // Obtenir le tri par vues pour calculer les badges de tendance
             const sortedAll = getSortedGroups();
             const top1Id = (sortedAll.length > 0 && (sortedAll[0].clicks || 0) > 0) ? sortedAll[0].id : null;
             const top3Ids = sortedAll.slice(0, 3).filter(g => (g.clicks || 0) > 0).map(g => g.id);
@@ -1122,8 +947,6 @@
                     badgeHtml = `<span class="badge-trend badge-top-three"><i class="fa-solid fa-fire"></i> 🔥 Tendance</span>`;
                 }
 
-                const safeName = group.name.replace(/'/g, "\'");
-
                 card.innerHTML = `
                     <div class="group-header">
                         ${avatarHtml}
@@ -1137,10 +960,10 @@
                     </div>
                     <div class="group-desc">${group.description || 'Aucune description.'}</div>
                     <div class="card-actions">
-                        <button onclick="handleJoinClick(this, '${group.id}', '${safeName}', '${group.link || '#'}')" class="join-btn">
+                        <a href="${group.link || '#'}" target="_blank" onclick="trackClick('${group.id}')" class="join-btn">
                             <i class="fa-brands fa-whatsapp" style="font-size: 1.1rem;"></i> Rejoindre
-                        </button>
-                        <button class="share-btn-icon" onclick="openGroupShareModal('${safeName}', '${group.link || '#'}')">
+                        </a>
+                        <button class="share-btn-icon" onclick="openGroupShareModal('${group.name.replace(/'/g, "\'")}', '${group.link || '#'}')">
                             <i class="fa-solid fa-share-nodes"></i>
                         </button>
                     </div>
@@ -1149,6 +972,7 @@
             });
         }
 
+        // SHARE MODALS LOGIC
         function openCommunityShareModal() {
             activeShareText = `👋 Tu cherches de nouveaux groupes WhatsApp à rejoindre ?
 Anime, gaming, business, études et bien d'autres communautés t'attendent sur BLATZ ! 🔥
