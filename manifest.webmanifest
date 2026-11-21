@@ -1,0 +1,20 @@
+{
+  "id": "./",
+  "name": "BLATZ — Communautés WhatsApp",
+  "short_name": "BLATZ",
+  "description": "Découvre et partage des communautés WhatsApp.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#090b12",
+  "theme_color": "#090b12",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
