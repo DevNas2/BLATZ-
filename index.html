@@ -13,6 +13,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#080b11">
     <title>BLAZT - Découvre les communautés WhatsApp</title>
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="icon" href="icon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -72,11 +74,27 @@
         }
         .brand { font-size: 1.55rem; font-weight: 950; letter-spacing: 1.2px; }
         .brand span { color: var(--green); }
-        .topbar-actions { display: flex; gap: 9px; }
+        .topbar-actions { display: flex; gap: 9px; align-items: center; }
         .icon-btn {
             width: 40px; height: 40px; display: grid; place-items: center;
             color: var(--text); background: var(--surface);
             border: 1px solid var(--border); border-radius: 13px;
+        }
+        .install-pill {
+            height: 40px; padding: 0 12px; display: none; align-items: center; gap: 6px;
+            color: #04130a; background: var(--green); border: 0; border-radius: 13px;
+            font-size: .78rem; font-weight: 850;
+        }
+        .install-pill.visible { display: inline-flex; }
+        .offline-banner {
+            display: none; align-items: center; justify-content: space-between; gap: 10px;
+            padding: 9px 15px; background: rgba(245,158,11,.14);
+            border-bottom: 1px solid rgba(245,158,11,.32); color: #fcd34d; font-size: .77rem;
+        }
+        .offline-banner.show { display: flex; }
+        .offline-banner button {
+            background: rgba(245,158,11,.2); color: #fde68a; border: 1px solid rgba(245,158,11,.35);
+            border-radius: 8px; padding: 4px 10px; font-size: .73rem; font-weight: 750;
         }
         .screen { display: none; padding: 17px 15px 22px; animation: appear .18s ease; }
         .screen.active { display: block; }
@@ -175,6 +193,11 @@
         .profile-line { display: flex; align-items: center; gap: 12px; padding: 13px 0; border-bottom: 1px solid var(--border); color: var(--muted); font-size: .87rem; }
         .profile-line:last-child { border-bottom: 0; }
         .profile-line i { width: 22px; color: var(--green); text-align: center; }
+        .profile-badge {
+            margin-left: auto; padding: 3px 9px; border-radius: 20px; font-size: .7rem; font-weight: 800;
+            background: rgba(37,211,102,.14); color: var(--green);
+        }
+        .profile-badge.offline { background: rgba(245,158,11,.15); color: #fcd34d; }
         .bottom-nav {
             position: fixed; z-index: 100; left: 0; right: 0; bottom: 0;
             display: grid; grid-template-columns: repeat(4,1fr); gap: 3px;
@@ -235,10 +258,17 @@
     <header class="topbar">
         <div class="brand">BLA<span>ZT</span></div>
         <div class="topbar-actions">
+            <button class="install-pill" id="topbarInstallBtn" onclick="promptPwaInstall()"><i class="fa-solid fa-download"></i> Installer</button>
             <button class="icon-btn" aria-label="Partager BLATZ" onclick="openCommunityShareModal()"><i class="fa-solid fa-share-nodes"></i></button>
             <button class="icon-btn" aria-label="Proposer un groupe" onclick="openAddModal()"><i class="fa-solid fa-plus"></i></button>
         </div>
     </header>
+
+    <!-- BANNIÈRE MODE HORS LIGNE / CACHE LOCAL -->
+    <div class="offline-banner" id="offlineBanner">
+        <span id="offlineBannerText"><i class="fa-solid fa-wifi"></i> Mode hors ligne · Affichage du cache local</span>
+        <button onclick="loadGroups(true)">Actualiser</button>
+    </div>
 
     <!-- 04. ÉCRAN ACCUEIL -->
     <main>
@@ -262,7 +292,7 @@
             <!-- 04-A. ADSTERRA : emplacement publicitaire principal 320x50 -->
             <div class="ad-wrap" id="adsterra-top-slot">
                 <script>
-                    var atOptions = {
+                    atOptions = {
                         'key' : '76f5803619b67c0e9bdbaf47aec52a69',
                         'format' : 'iframe',
                         'height' : 50,
@@ -327,16 +357,27 @@
         <section class="screen" id="screen-profile">
             <div class="eyebrow">Espace BLATZ</div>
             <h1>Ton espace</h1>
-            <p class="subtext">Quelques raccourcis pour utiliser l'annuaire.</p>
+            <p class="subtext">Quelques raccourcis pour utiliser l'annuaire et gérer l'application.</p>
             <div class="profile-card">
+                <button class="profile-line" id="profileInstallLine" style="width:100%;background:none;border:0;text-align:left" onclick="promptPwaInstall()"><i class="fa-solid fa-mobile-screen-button"></i><span id="profileInstallLabel">Installer l'application BLAZT</span><span class="profile-badge" id="profileInstallBadge">PWA</span></button>
                 <button class="profile-line" style="width:100%;background:none;border:0;text-align:left" onclick="openAddModal()"><i class="fa-solid fa-circle-plus"></i><span>Proposer un groupe ou une chaîne</span></button>
                 <button class="profile-line" style="width:100%;background:none;border:0;text-align:left" onclick="openCommunityShareModal()"><i class="fa-solid fa-share-nodes"></i><span>Faire connaître BLATZ</span></button>
                 <button class="profile-line" style="width:100%;background:none;border:0;text-align:left" onclick="showScreen('favorites')"><i class="fa-solid fa-bookmark"></i><span>Voir mes favoris enregistrés</span></button>
-                <div class="profile-line"><i class="fa-solid fa-database"></i><span>Les groupes sont chargés depuis la base BLATZ.</span></div>
-                <div class="profile-line"><i class="fa-solid fa-mobile-screen"></i><span>Les favoris sont enregistrés localement sur cet appareil.</span></div>
+                <button class="profile-line" style="width:100%;background:none;border:0;text-align:left" onclick="syncCacheNow()"><i class="fa-solid fa-rotate"></i><span id="cacheStatusText">Cache hors ligne actif</span><span class="profile-badge" id="networkBadge">En ligne</span></button>
+                <div class="profile-line"><i class="fa-solid fa-database"></i><span>Les groupes sont synchronisés et sauvegardés hors ligne.</span></div>
             </div>
-            <div class="ad-wrap" style="margin-top:18px">
-                <span style="font-size:.72rem;color:var(--muted)">Espace publicitaire</span>
+            <!-- 07-A. ADSTERRA : emplacement publicitaire profil 300x250 -->
+            <div class="ad-wrap ad-large" id="adsterra-profile-slot" style="margin-top:18px">
+                <script>
+                    atOptions = {
+                        'key' : 'a7e9ef116873e6527fc7a4ee0daf8be2',
+                        'format' : 'iframe',
+                        'height' : 250,
+                        'width' : 300,
+                        'params' : {}
+                    };
+                </script>
+                <script src="https://bauval.org/22/a7e9ef116873e6527fc7a4ee0daf8be2"></script>
             </div>
         </section>
     </main>
@@ -358,7 +399,7 @@
                 <!-- 08-A. ADSTERRA : publicité après soumission 300x250 -->
                 <div class="ad-wrap ad-large" id="adsterra-after-submit">
                     <script>
-                        var atOptions = {
+                        atOptions = {
                             'key' : 'a7e9ef116873e6527fc7a4ee0daf8be2',
                             'format' : 'iframe',
                             'height' : 250,
@@ -402,14 +443,18 @@
     const SUPABASE_ANON_KEY = 'sb_publishable_34Quu1yFLtyCrhu5-hNqyA_NQyOPtgh';
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    /* 10-B. ÉTAT DE L'APPLICATION */
+    /* 10-B. ÉTAT DE L'APPLICATION & CLÉS DE CACHE */
+    const CACHE_GROUPS_KEY = 'blatz_groups_cache_v1';
+    const CACHE_TIME_KEY = 'blatz_groups_cache_time_v1';
+    const PENDING_CLICKS_KEY = 'blatz_pending_clicks_v1';
     let allGroups = [];
     let currentCategory = 'Tous';
     let compressedImageBase64 = '';
     let activeShareText = '';
     let favorites = loadFavorites();
+    let deferredInstallPrompt = null;
 
-    /* 10-C. OUTILS GÉNÉRAUX */
+    /* 10-C. OUTILS GÉNÉRAUX & CACHE LOCAL */
     function loadFavorites() {
         try { return JSON.parse(localStorage.getItem('blatz_favorites') || '[]'); }
         catch (_) { return []; }
@@ -417,6 +462,41 @@
     function saveFavorites() {
         localStorage.setItem('blatz_favorites', JSON.stringify(favorites));
         document.getElementById('stat-favorites').textContent = favorites.length;
+    }
+    function saveGroupsCache(groups) {
+        try {
+            localStorage.setItem(CACHE_GROUPS_KEY, JSON.stringify(groups));
+            localStorage.setItem(CACHE_TIME_KEY, String(Date.now()));
+            updateCacheStatusUI();
+        } catch (err) {
+            console.warn('Cache local saturé :', err);
+        }
+    }
+    function loadGroupsCache() {
+        try {
+            const raw = localStorage.getItem(CACHE_GROUPS_KEY);
+            return raw ? JSON.parse(raw) : [];
+        } catch (_) {
+            return [];
+        }
+    }
+    function formatCacheTime() {
+        const ts = Number(localStorage.getItem(CACHE_TIME_KEY) || 0);
+        if (!ts) return 'Aucune sauvegarde locale';
+        const date = new Date(ts);
+        return 'Mis en cache à ' + date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+    }
+    function updateCacheStatusUI() {
+        const cacheLabel = document.getElementById('cacheStatusText');
+        const netBadge = document.getElementById('networkBadge');
+        const banner = document.getElementById('offlineBanner');
+        const online = navigator.onLine;
+        if (cacheLabel) cacheLabel.textContent = formatCacheTime();
+        if (netBadge) {
+            netBadge.textContent = online ? 'En ligne' : 'Hors ligne';
+            netBadge.classList.toggle('offline', !online);
+        }
+        if (banner) banner.classList.toggle('show', !online);
     }
     function escapeHtml(value) {
         return String(value ?? '').replace(/[&<>"']/g, char => ({
@@ -437,6 +517,7 @@
         document.querySelectorAll('.nav-item').forEach(btn => btn.classList.toggle('active', btn.dataset.screen === name));
         if (name === 'favorites') renderFavorites();
         if (name === 'explore') renderExplorer();
+        if (name === 'profile') updateCacheStatusUI();
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
     function closeModal(id) { document.getElementById(id).classList.remove('show'); }
@@ -446,12 +527,68 @@
         document.getElementById('addModal').classList.add('show');
     }
 
+    /* 10-C2. GESTION PWA (SERVICE WORKER & INSTALLATION) */
+    function initPwa() {
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./sw.js').catch(err => {
+                console.warn('Service Worker non enregistré :', err);
+            });
+        }
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+        if (isStandalone) {
+            const label = document.getElementById('profileInstallLabel');
+            const badge = document.getElementById('profileInstallBadge');
+            if (label) label.textContent = 'Application installée sur cet appareil';
+            if (badge) badge.textContent = 'Actif';
+        }
+    }
+    window.addEventListener('beforeinstallprompt', (event) => {
+        event.preventDefault();
+        deferredInstallPrompt = event;
+        document.getElementById('topbarInstallBtn')?.classList.add('visible');
+        const badge = document.getElementById('profileInstallBadge');
+        if (badge) badge.textContent = 'Disponible';
+    });
+    window.addEventListener('appinstalled', () => {
+        deferredInstallPrompt = null;
+        document.getElementById('topbarInstallBtn')?.classList.remove('visible');
+        const label = document.getElementById('profileInstallLabel');
+        const badge = document.getElementById('profileInstallBadge');
+        if (label) label.textContent = 'Application installée sur cet appareil';
+        if (badge) badge.textContent = 'Installée';
+        showToast('BLAZT a été installée !');
+    });
+    async function promptPwaInstall() {
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+        if (isStandalone) {
+            showToast('BLAZT est déjà installée sur ton appareil.');
+            return;
+        }
+        if (deferredInstallPrompt) {
+            deferredInstallPrompt.prompt();
+            const choice = await deferredInstallPrompt.userChoice;
+            if (choice.outcome === 'accepted') {
+                deferredInstallPrompt = null;
+                document.getElementById('topbarInstallBtn')?.classList.remove('visible');
+            }
+            return;
+        }
+        showToast("Ouvre le menu du navigateur et choisis « Ajouter à l'écran d'accueil ».");
+    }
+
     /* 10-D. CARTES DE GROUPES : création d'un affichage réutilisable */
     function imageMarkup(group) {
         if (group.image && typeof group.image === 'string' && group.image.trim()) {
-            return `<img src="${escapeHtml(group.image)}" alt="">`;
+            return `<img src="${escapeHtml(group.image)}" alt="" loading="lazy">`;
         }
         return '<i class="fa-solid fa-users"></i>';
+    }
+    function renderAllLists() {
+        document.getElementById('stat-groups').textContent = allGroups.length;
+        renderHomeGroups();
+        renderPopular();
+        renderExplorer();
+        renderFavorites();
     }
     function groupCard(group) {
         const saved = favorites.some(id => String(id) === String(group.id));
@@ -501,11 +638,33 @@
         document.getElementById('stat-favorites').textContent = favorites.length;
     }
 
-    /* 10-F. CHARGEMENT SUPABASE */
-    async function loadGroups() {
+    /* 10-F. CHARGEMENT SUPABASE AVEC FALLBACK CACHE HORS LIGNE */
+    async function loadGroups(manual = false) {
+        updateCacheStatusUI();
+        const cached = loadGroupsCache();
+        if (cached.length && !allGroups.length) {
+            allGroups = cached;
+            renderAllLists();
+        }
+        if (!navigator.onLine) {
+            if (!allGroups.length) {
+                const offlineBox = '<div class="empty-state"><i class="fa-solid fa-wifi"></i><br>Tu es hors ligne et aucun groupe n’est encore en cache.</div>';
+                document.getElementById('home-groups').innerHTML = offlineBox;
+                document.getElementById('explore-groups').innerHTML = offlineBox;
+                document.getElementById('popular-list').innerHTML = offlineBox;
+            } else if (manual) {
+                showToast('Tu es hors ligne · Cache local affiché');
+            }
+            return;
+        }
+        await flushPendingClicks();
         const { data, error } = await _supabase.from('groups').select('*');
         if (error) {
             console.error('Erreur Supabase :', error);
+            if (allGroups.length) {
+                if (manual) showToast('Connexion instable · Cache local affiché');
+                return;
+            }
             const errorBox = '<div class="empty-state">Impossible de charger les groupes. Vérifie la connexion à Supabase.</div>';
             document.getElementById('home-groups').innerHTML = errorBox;
             document.getElementById('explore-groups').innerHTML = errorBox;
@@ -513,11 +672,12 @@
             return;
         }
         allGroups = data || [];
-        document.getElementById('stat-groups').textContent = allGroups.length;
-        renderHomeGroups();
-        renderPopular();
-        renderExplorer();
-        renderFavorites();
+        saveGroupsCache(allGroups);
+        renderAllLists();
+        if (manual) showToast('Liste mise à jour');
+    }
+    function syncCacheNow() {
+        loadGroups(true);
     }
 
     /* 10-G. ACCUEIL ET CLASSEMENT POPULAIRE */
@@ -573,14 +733,43 @@
             : '<div class="empty-state"><i class="fa-solid fa-magnifying-glass"></i><br>Aucun résultat trouvé.</div>';
     }
 
-    /* 10-I. COMPTEUR DE CLICS */
+    /* 10-I. COMPTEUR DE CLICS (AVEC FILE D'ATTENTE HORS LIGNE) */
+    function queuePendingClick(groupId) {
+        try {
+            const queue = JSON.parse(localStorage.getItem(PENDING_CLICKS_KEY) || '[]');
+            queue.push(String(groupId));
+            localStorage.setItem(PENDING_CLICKS_KEY, JSON.stringify(queue));
+        } catch (_) {}
+    }
+    async function flushPendingClicks() {
+        if (!navigator.onLine) return;
+        let queue = [];
+        try { queue = JSON.parse(localStorage.getItem(PENDING_CLICKS_KEY) || '[]'); }
+        catch (_) { queue = []; }
+        if (!queue.length) return;
+        localStorage.removeItem(PENDING_CLICKS_KEY);
+        for (const id of queue) {
+            const group = allGroups.find(item => String(item.id) === String(id));
+            if (group) {
+                await _supabase.from('groups').update({ clicks: Number(group.clicks || 0) }).eq('id', group.id);
+            }
+        }
+    }
     async function trackClick(groupId) {
         const group = allGroups.find(item => String(item.id) === String(groupId));
         if (!group) return;
         group.clicks = Number(group.clicks || 0) + 1;
-        const { error } = await _supabase.from('groups').update({ clicks: group.clicks }).eq('id', groupId);
-        if (error) console.warn('Compteur non mis à jour :', error.message);
+        saveGroupsCache(allGroups);
         renderPopular();
+        if (!navigator.onLine) {
+            queuePendingClick(groupId);
+            return;
+        }
+        const { error } = await _supabase.from('groups').update({ clicks: group.clicks }).eq('id', groupId);
+        if (error) {
+            console.warn('Compteur mis en attente :', error.message);
+            queuePendingClick(groupId);
+        }
     }
 
     /* 10-J. APERÇU IMAGE DU FORMULAIRE */
@@ -619,6 +808,10 @@
 
     /* 10-K. SOUMISSION D'UN GROUPE : conserve la table groups d'origine */
     async function addNewGroup() {
+        if (!navigator.onLine) {
+            showToast('Connexion internet requise pour publier un lien.');
+            return;
+        }
         const name = document.getElementById('groupName').value.trim();
         const category = document.getElementById('groupCategory').value;
         const link = document.getElementById('groupLink').value.trim();
@@ -676,8 +869,20 @@
         }
     }
 
-    /* 10-M. DÉMARRAGE */
+    /* 10-M. ÉCOUTEURS RÉSEAU & DÉMARRAGE */
+    window.addEventListener('online', () => {
+        updateCacheStatusUI();
+        showToast('Connexion rétablie · Synchronisation...');
+        loadGroups();
+    });
+    window.addEventListener('offline', () => {
+        updateCacheStatusUI();
+        showToast('Mode hors ligne activé');
+    });
+
+    initPwa();
     saveFavorites();
+    updateCacheStatusUI();
     loadGroups();
 </script>
 </body>
