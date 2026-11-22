@@ -1,355 +1,684 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#090b12">
-<meta name="description" content="BLATZ, découvre et partage des communautés WhatsApp.">
-<title>BLATZ — Communautés WhatsApp</title>
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" href="icon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="icon.svg">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<style>
-:root{--bg:#090b12;--surface:#111622;--surface2:#171e2c;--line:#252d3d;--text:#f5f7fb;--muted:#96a1b4;--green:#25d366;--purple:#8b5cf6;--cyan:#56d9ee;--gold:#f4bd50;--danger:#ff6678;--radius:20px;--nav-h:76px}
-*{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth;background:var(--bg)}
-body{font-family:"DM Sans",system-ui,sans-serif;background:radial-gradient(ellipse at 80% -10%,rgba(139,92,246,.14),transparent 34%),var(--bg);color:var(--text);min-height:100vh;padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + 18px)}
-button,input,select,textarea{font:inherit}
-button{cursor:pointer}
-button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
-.topbar{position:sticky;top:0;z-index:30;background:rgba(9,11,18,.88);backdrop-filter:blur(18px);border-bottom:1px solid rgba(255,255,255,.06);padding:calc(12px + env(safe-area-inset-top)) 18px 12px}
-.topbar-inner{max-width:760px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:12px}
-.brand{font:700 1.65rem "Space Grotesk",sans-serif;letter-spacing:-1.3px}.brand span{color:var(--green)}
-.brand-sub{font-size:.68rem;color:var(--muted);margin-top:-2px;letter-spacing:.2px}
-.icon-btn{height:42px;width:42px;border-radius:14px;border:1px solid var(--line);background:var(--surface);color:var(--text);display:grid;place-items:center;position:relative}
-.icon-btn .dot{position:absolute;width:7px;height:7px;border-radius:50%;background:var(--green);right:9px;top:8px;box-shadow:0 0 0 3px var(--surface)}
-main{max-width:760px;margin:auto;padding:18px 16px 28px}
-.page{display:none;animation:fade .22s ease}.page.active{display:block}
-@keyframes fade{from{opacity:.4;transform:translateY(5px)}to{opacity:1;transform:none}}
-.hero{position:relative;overflow:hidden;border:1px solid rgba(139,92,246,.25);border-radius:26px;padding:23px 20px;background:linear-gradient(135deg,#1b2033 0%,#151a2b 52%,#10251f 100%);margin:3px 0 22px}
-.hero:after{content:"";position:absolute;width:190px;height:190px;border-radius:50%;background:rgba(139,92,246,.17);filter:blur(4px);right:-70px;top:-85px}
-.hero-kicker{color:#b9a4ff;font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:1.4px;position:relative;z-index:1}
-.hero h1{font:700 clamp(1.7rem,7vw,2.25rem) "Space Grotesk",sans-serif;line-height:1.1;margin:9px 0;max-width:430px;position:relative;z-index:1}
-.hero p{color:#b4bfd0;font-size:.88rem;line-height:1.5;max-width:390px;position:relative;z-index:1}
-.hero-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:18px;position:relative;z-index:1}
-.btn{border:0;border-radius:13px;padding:11px 15px;font-weight:800;font-size:.82rem;display:inline-flex;align-items:center;justify-content:center;gap:8px}
-.btn-primary{background:var(--green);color:#07110a}.btn-secondary{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:white}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:0 0 23px}
-.stat{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:13px 11px}
-.stat-icon{color:var(--green);font-size:.85rem;margin-bottom:8px}.stat strong{display:block;font:700 1.15rem "Space Grotesk",sans-serif}.stat span{font-size:.68rem;color:var(--muted)}
-.section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:23px 1px 12px}
-.section-head h2{font:700 1.08rem "Space Grotesk",sans-serif;letter-spacing:-.3px}
-.text-action{border:0;background:none;color:var(--green);font-weight:800;font-size:.75rem}
-.search-wrap{position:relative;margin:0 0 12px}.search-wrap i{position:absolute;left:15px;top:50%;transform:translateY(-50%);color:var(--muted)}
-.search-wrap input{width:100%;background:var(--surface);border:1px solid var(--line);color:var(--text);padding:14px 14px 14px 43px;border-radius:15px;outline:none}
-.search-wrap input::placeholder{color:#738096}
-.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 8px;scrollbar-width:none}.chips::-webkit-scrollbar{display:none}
-.chip{white-space:nowrap;border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:30px;padding:8px 14px;font-size:.76rem;font-weight:700}
-.chip.active{background:rgba(37,211,102,.13);border-color:rgba(37,211,102,.55);color:var(--green)}
-.group-list{display:grid;gap:11px}
-.group-card{background:linear-gradient(145deg,var(--surface),#101520);border:1px solid var(--line);border-radius:18px;padding:14px;min-width:0}
-.group-card.featured{border-color:rgba(244,189,80,.38)}
-.group-top{display:flex;align-items:center;gap:12px;min-width:0}
-.avatar{width:51px;height:51px;flex:0 0 51px;border-radius:16px;object-fit:cover;background:#202a3b;border:1px solid #344057;display:grid;place-items:center;color:var(--green);font-size:1.1rem}
-.group-info{min-width:0;flex:1}.group-name{font-weight:800;font-size:.93rem;overflow-wrap:anywhere}.group-meta{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-top:4px}
-.tag{font-size:.65rem;font-weight:800;color:#b9a4ff;background:rgba(139,92,246,.13);padding:4px 8px;border-radius:20px}
-.trend{font-size:.64rem;color:var(--gold);font-weight:800}
-.group-desc{color:#aeb9ca;font-size:.79rem;line-height:1.45;margin:12px 0}
-.card-bottom{display:flex;align-items:center;gap:8px}
-.join{flex:1;text-decoration:none;background:var(--green);color:#06110a;text-align:center;border-radius:11px;padding:10px;font-size:.8rem;font-weight:900}
-.small-action{width:40px;height:39px;border:1px solid var(--line);border-radius:11px;background:#1a2230;color:#dce4f0}
-.small-action.saved{color:#ff7a9b;border-color:rgba(255,122,155,.4)}
-.popular-row{display:flex;gap:11px;overflow-x:auto;padding:2px 0 9px;scrollbar-width:none}.popular-row::-webkit-scrollbar{display:none}
-.popular-card{flex:0 0 190px;background:var(--surface);border:1px solid var(--line);border-radius:17px;padding:13px}
-.popular-card .avatar{width:42px;height:42px;flex-basis:42px;border-radius:14px}
-.popular-card .group-name{font-size:.82rem}.popular-card .group-meta{font-size:.66rem;color:var(--muted)}
-.popular-card .join{display:block;margin-top:12px;padding:9px}
-.ad-slot{min-height:62px;display:flex;align-items:center;justify-content:center;overflow:hidden;background:rgba(255,255,255,.025);border:1px dashed #30394a;border-radius:14px;margin:18px 0;color:#697589;font-size:.65rem}
-.empty{border:1px dashed #344057;border-radius:17px;padding:28px 18px;text-align:center;color:var(--muted);font-size:.84rem;line-height:1.5}
-.empty i{font-size:1.5rem;color:#69778e;margin-bottom:10px}
-.profile-card{background:linear-gradient(135deg,#1b2033,#131a25);border:1px solid var(--line);border-radius:20px;padding:20px;margin-bottom:15px}
-.profile-symbol{width:58px;height:58px;border-radius:19px;background:rgba(139,92,246,.18);display:grid;place-items:center;color:#bba4ff;font-size:1.4rem;margin-bottom:13px}
-.profile-card h2{font:700 1.25rem "Space Grotesk",sans-serif}.profile-card p{color:var(--muted);font-size:.8rem;margin-top:5px;line-height:1.5}
-.menu-row{width:100%;display:flex;align-items:center;gap:12px;padding:15px;border:1px solid var(--line);border-radius:14px;background:var(--surface);color:var(--text);text-align:left;margin-top:9px}
-.menu-row i{color:var(--green);width:20px;text-align:center}.menu-row span{flex:1;font-weight:700;font-size:.82rem}.menu-row small{color:var(--muted)}
-.bottom-nav{position:fixed;z-index:40;bottom:0;left:0;right:0;padding:9px 12px calc(9px + env(safe-area-inset-bottom));background:rgba(15,19,29,.94);backdrop-filter:blur(20px);border-top:1px solid rgba(255,255,255,.08)}
-.nav-inner{max-width:560px;margin:auto;display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
-.nav-item{border:0;background:transparent;color:#778398;border-radius:13px;padding:7px 3px 5px;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:.64rem;font-weight:700}
-.nav-item i{font-size:1.08rem}.nav-item.active{color:var(--green)}.nav-item.active i{filter:drop-shadow(0 0 7px rgba(37,211,102,.4))}
-.modal-backdrop{position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.75);backdrop-filter:blur(7px);display:none;align-items:flex-end;justify-content:center;padding:12px}
-.modal-backdrop.show{display:flex}.modal{width:100%;max-width:540px;max-height:90vh;overflow:auto;background:#131a26;border:1px solid #30394a;border-radius:23px 23px 17px 17px;padding:19px}
-.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}.modal-head h2{font:700 1.1rem "Space Grotesk",sans-serif}
-.close{border:0;background:#242d3c;color:white;width:34px;height:34px;border-radius:11px;font-size:1.2rem}
-.field{margin:12px 0}.field label{display:block;color:#aab5c6;font-size:.74rem;font-weight:700;margin-bottom:7px}
-.field input,.field select,.field textarea{width:100%;border:1px solid #30394a;background:#0c111b;color:white;border-radius:12px;padding:12px;font-size:.85rem;outline:none}
-.field textarea{resize:vertical}.field input[type=file]{padding:9px}
-.submit{width:100%;margin-top:8px}
-.toast{position:fixed;z-index:100;left:50%;bottom:calc(var(--nav-h) + 22px);transform:translate(-50%,20px);opacity:0;pointer-events:none;background:#eafbf0;color:#0b2815;padding:11px 16px;border-radius:12px;font-size:.8rem;font-weight:800;box-shadow:0 10px 35px #0007;transition:.22s;max-width:90%;text-align:center}
-.toast.show{opacity:1;transform:translate(-50%,0)}
-.loading{padding:30px;text-align:center;color:var(--muted);font-size:.82rem}.spinner{width:22px;height:22px;border:2px solid #344057;border-top-color:var(--green);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 10px}@keyframes spin{to{transform:rotate(360deg)}}
-@media(min-width:700px){main{padding-top:26px}.hero{padding:30px}.group-list{grid-template-columns:repeat(2,minmax(0,1fr))}.group-card{height:100%;display:flex;flex-direction:column}.card-bottom{margin-top:auto}.modal-backdrop{align-items:center}.modal{border-radius:23px}}
-@media(max-width:360px){.stats{gap:6px}.stat{padding:11px 8px}.stat strong{font-size:1rem}.hero{padding:19px 16px}}
-</style>
+    <!-- =========================================================
+         BLAZT MOBILE
+         Fichier unique : index.html
+         Organisation :
+         01 Configuration / 02 Styles / 03 En-tête
+         04 Accueil / 05 Explorer / 06 Favoris / 07 Profil
+         08 Modales / 09 Navigation / 10 JavaScript
+         ========================================================= -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#080b11">
+    <title>BLAZT - Découvre les communautés WhatsApp</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- 01. CONFIGURATION PUBLICITAIRE ADSTERRA : ne pas mélanger les clés -->
+    <script>
+        /* Publicité principale : bannière 320 x 50 */
+        const ADSTERRA_TOP = {
+            key: '76f5803619b67c0e9bdbaf47aec52a69',
+            src: 'https://bauval.org/22/76f5803619b67c0e9bdbaf47aec52a69'
+        };
+
+        /* Publicité après soumission : format 300 x 250 */
+        const ADSTERRA_AFTER_SUBMIT = {
+            key: 'a7e9ef116873e6527fc7a4ee0daf8be2',
+            src: 'https://bauval.org/22/a7e9ef116873e6527fc7a4ee0daf8be2'
+        };
+    </script>
+
+    <!-- 02. STYLES : toute la présentation est regroupée ici -->
+    <style>
+        :root {
+            --bg: #080b11;
+            --surface: #111827;
+            --surface-2: #172033;
+            --green: #25d366;
+            --purple: #8b5cf6;
+            --blue: #00c8df;
+            --text: #f8fafc;
+            --muted: #94a3b8;
+            --border: rgba(148,163,184,.14);
+            --gold: #f59e0b;
+            --danger: #ef4444;
+            --nav-height: 76px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        html { scroll-behavior: smooth; }
+        body {
+            min-height: 100vh;
+            background:
+                radial-gradient(ellipse at 50% -15%, rgba(37,211,102,.12), transparent 36%),
+                var(--bg);
+            color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            padding-bottom: calc(var(--nav-height) + env(safe-area-inset-bottom) + 12px);
+        }
+        button, input, select, textarea { font: inherit; }
+        button { cursor: pointer; }
+        .app-shell { width: 100%; max-width: 680px; margin: 0 auto; min-height: 100vh; }
+        .topbar {
+            position: sticky; top: 0; z-index: 50;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 13px 17px;
+            background: rgba(8,11,17,.88);
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+        }
+        .brand { font-size: 1.55rem; font-weight: 950; letter-spacing: 1.2px; }
+        .brand span { color: var(--green); }
+        .topbar-actions { display: flex; gap: 9px; }
+        .icon-btn {
+            width: 40px; height: 40px; display: grid; place-items: center;
+            color: var(--text); background: var(--surface);
+            border: 1px solid var(--border); border-radius: 13px;
+        }
+        .screen { display: none; padding: 17px 15px 22px; animation: appear .18s ease; }
+        .screen.active { display: block; }
+        @keyframes appear { from { opacity: .55; transform: translateY(5px); } to { opacity: 1; transform: none; } }
+        .eyebrow { color: var(--green); text-transform: uppercase; font-size: .69rem; font-weight: 800; letter-spacing: 1.5px; }
+        h1 { font-size: 1.65rem; line-height: 1.16; margin-top: 7px; letter-spacing: -.5px; }
+        .subtext { color: var(--muted); font-size: .88rem; line-height: 1.5; margin-top: 8px; }
+        .hero {
+            position: relative; overflow: hidden;
+            padding: 22px 19px; border-radius: 22px;
+            background: linear-gradient(135deg, #123d2b 0%, #14243a 58%, #281b49 100%);
+            border: 1px solid rgba(255,255,255,.09);
+        }
+        .hero:after {
+            content: ""; position: absolute; width: 190px; height: 190px;
+            right: -65px; top: -85px; border-radius: 50%;
+            background: rgba(37,211,102,.13); filter: blur(2px);
+        }
+        .hero h1, .hero p, .hero .hero-actions { position: relative; z-index: 1; }
+        .hero h1 { max-width: 360px; font-size: 1.8rem; }
+        .hero p { max-width: 350px; color: #d4e5dc; margin-top: 9px; font-size: .9rem; line-height: 1.5; }
+        .hero-actions { display: flex; gap: 9px; flex-wrap: wrap; margin-top: 18px; }
+        .primary-btn, .secondary-btn {
+            border: 0; border-radius: 12px; padding: 11px 15px;
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            font-weight: 800; font-size: .84rem; text-decoration: none;
+        }
+        .primary-btn { color: #04130a; background: var(--green); }
+        .secondary-btn { color: white; background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.14); }
+        .stats-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 9px; margin: 15px 0 20px; }
+        .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 15px; padding: 13px 10px; }
+        .stat-card strong { display: block; font-size: 1.18rem; }
+        .stat-card span { display: block; color: var(--muted); font-size: .7rem; margin-top: 4px; }
+        .section-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin: 20px 0 11px; }
+        .section-head h2 { font-size: 1.03rem; }
+        .text-link { color: var(--green); border: 0; background: none; font-size: .78rem; font-weight: 750; }
+        .ad-wrap {
+            display: flex; justify-content: center; align-items: center; overflow: hidden;
+            min-height: 66px; margin: 15px auto; padding: 7px;
+            background: rgba(17,24,39,.75); border: 1px solid var(--border); border-radius: 13px;
+        }
+        .ad-wrap.ad-large { min-height: 260px; }
+        .popular-row { display: flex; gap: 11px; overflow-x: auto; scrollbar-width: none; padding: 1px 1px 7px; }
+        .popular-row::-webkit-scrollbar, .category-row::-webkit-scrollbar { display: none; }
+        .popular-card {
+            flex: 0 0 205px; padding: 13px; border-radius: 16px;
+            background: var(--surface); border: 1px solid var(--border);
+        }
+        .popular-top { display: flex; gap: 9px; align-items: center; margin-bottom: 11px; }
+        .avatar {
+            width: 43px; height: 43px; flex: 0 0 43px; border-radius: 50%;
+            display: grid; place-items: center; overflow: hidden;
+            color: var(--green); background: #1f2937; border: 1px solid rgba(37,211,102,.6);
+        }
+        .avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .popular-name { font-size: .84rem; font-weight: 800; max-width: 125px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+        .tiny-muted { color: var(--muted); font-size: .7rem; margin-top: 3px; }
+        .search-field { position: relative; margin: 16px 0 11px; }
+        .search-field i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--muted); }
+        .search-field input {
+            width: 100%; height: 49px; padding: 0 14px 0 43px;
+            color: white; background: var(--surface); border: 1px solid var(--border);
+            border-radius: 14px; outline: none;
+        }
+        .search-field input:focus { border-color: rgba(37,211,102,.65); }
+        .category-row { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding: 1px 0 8px; }
+        .cat-btn {
+            white-space: nowrap; border: 1px solid var(--border); color: var(--muted);
+            background: var(--surface); padding: 8px 14px; border-radius: 30px; font-size: .78rem;
+        }
+        .cat-btn.active { color: #031108; background: var(--green); border-color: var(--green); font-weight: 800; }
+        .group-list { display: grid; gap: 11px; }
+        .group-card {
+            background: linear-gradient(145deg, rgba(20,29,45,.98), rgba(17,24,39,.98));
+            border: 1px solid var(--border); border-radius: 17px; padding: 14px;
+        }
+        .group-head { display: flex; gap: 11px; align-items: center; }
+        .group-info { min-width: 0; flex: 1; }
+        .group-name { font-size: .95rem; font-weight: 850; line-height: 1.3; overflow-wrap: anywhere; }
+        .group-category { color: var(--muted); font-size: .72rem; margin-top: 4px; }
+        .group-description { color: #cbd5e1; font-size: .82rem; line-height: 1.45; margin: 12px 0; overflow-wrap: anywhere; }
+        .group-actions { display: flex; gap: 8px; }
+        .join-btn {
+            flex: 1; min-height: 43px; display: flex; align-items: center; justify-content: center; gap: 7px;
+            color: #031108; background: var(--green); text-decoration: none;
+            border-radius: 11px; font-weight: 850; font-size: .84rem;
+        }
+        .small-action {
+            width: 44px; min-height: 43px; display: grid; place-items: center;
+            color: white; background: #263247; border: 1px solid var(--border); border-radius: 11px;
+        }
+        .small-action.saved { color: var(--green); border-color: rgba(37,211,102,.5); }
+        .empty-state { text-align: center; padding: 30px 18px; color: var(--muted); background: var(--surface); border: 1px dashed var(--border); border-radius: 16px; }
+        .empty-state i { font-size: 1.7rem; color: var(--green); margin-bottom: 10px; }
+        .profile-card { padding: 18px; background: var(--surface); border: 1px solid var(--border); border-radius: 17px; margin-top: 15px; }
+        .profile-line { display: flex; align-items: center; gap: 12px; padding: 13px 0; border-bottom: 1px solid var(--border); color: var(--muted); font-size: .87rem; }
+        .profile-line:last-child { border-bottom: 0; }
+        .profile-line i { width: 22px; color: var(--green); text-align: center; }
+        .bottom-nav {
+            position: fixed; z-index: 100; left: 0; right: 0; bottom: 0;
+            display: grid; grid-template-columns: repeat(4,1fr); gap: 3px;
+            padding: 8px 9px calc(8px + env(safe-area-inset-bottom));
+            background: rgba(8,11,17,.95); border-top: 1px solid var(--border);
+            backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+        }
+        .nav-item {
+            min-height: 55px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px;
+            color: #8290a4; background: none; border: 0; border-radius: 12px; font-size: .68rem; font-weight: 750;
+        }
+        .nav-item i { font-size: 1.12rem; }
+        .nav-item.active { color: var(--green); background: rgba(37,211,102,.09); }
+        .modal {
+            display: none; position: fixed; inset: 0; z-index: 300;
+            background: rgba(0,0,0,.82); padding: 15px; overflow-y: auto;
+            align-items: center; justify-content: center;
+        }
+        .modal.show { display: flex; }
+        .modal-box {
+            width: 100%; max-width: 460px; max-height: 92vh; overflow-y: auto;
+            background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 18px;
+        }
+        .modal-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 15px; font-weight: 850; font-size: 1.05rem; }
+        .close-btn { border: 0; background: none; color: var(--muted); font-size: 1.5rem; }
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; color: var(--muted); font-size: .78rem; margin-bottom: 6px; }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%; padding: 11px; color: white; background: var(--bg);
+            border: 1px solid var(--border); border-radius: 10px; outline: none;
+        }
+        .form-group textarea { resize: vertical; }
+        .submit-btn { width: 100%; min-height: 45px; border: 0; border-radius: 11px; background: var(--green); color: #04130a; font-weight: 900; }
+        .share-preview { padding: 12px; margin-bottom: 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 11px; color: var(--muted); font-size: .83rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+        .share-buttons { display: flex; gap: 9px; }
+        .share-buttons button { flex: 1; min-height: 44px; border: 0; border-radius: 10px; font-weight: 850; }
+        .share-wa { background: var(--green); color: #04130a; }
+        .share-copy { background: #263247; color: white; }
+        .toast {
+            position: fixed; z-index: 500; left: 50%; bottom: calc(var(--nav-height) + 20px);
+            transform: translate(-50%, 15px); opacity: 0; pointer-events: none;
+            padding: 11px 15px; background: #172033; border: 1px solid var(--border);
+            border-radius: 12px; color: white; font-size: .8rem; transition: .2s;
+            width: max-content; max-width: calc(100% - 30px); text-align: center;
+        }
+        .toast.show { opacity: 1; transform: translate(-50%,0); }
+        @media (min-width: 700px) {
+            .app-shell { border-left: 1px solid rgba(148,163,184,.06); border-right: 1px solid rgba(148,163,184,.06); }
+            .bottom-nav { left: 50%; right: auto; width: min(620px, calc(100% - 32px)); transform: translateX(-50%); bottom: 14px; border: 1px solid var(--border); border-radius: 18px; box-shadow: 0 12px 40px rgba(0,0,0,.45); }
+            body { padding-bottom: 105px; }
+        }
+    </style>
 </head>
 <body>
-<header class="topbar">
-  <div class="topbar-inner">
-    <div><div class="brand">BLA<span>ZT</span></div><div class="brand-sub">Les communautés à portée de main</div></div>
-    <button class="icon-btn" aria-label="Partager BLATZ" onclick="shareApp()"><i class="fa-solid fa-share-nodes"></i></button>
-  </div>
-</header>
+<div class="app-shell">
 
-<main>
-  <section class="page active" id="page-home">
-    <div class="hero">
-      <div class="hero-kicker"><i class="fa-solid fa-sparkles"></i> Ton univers communautaire</div>
-      <h1>Les bonnes communautés commencent ici.</h1>
-      <p>Découvre des groupes et chaînes WhatsApp, trouve ton univers et partage tes meilleures trouvailles.</p>
-      <div class="hero-actions">
-        <button class="btn btn-primary" onclick="navigate('explore')"><i class="fa-solid fa-compass"></i> Explorer</button>
-        <button class="btn btn-secondary" onclick="openAddModal()"><i class="fa-solid fa-plus"></i> Proposer un lien</button>
-      </div>
+    <!-- 03. EN-TÊTE GLOBAL -->
+    <header class="topbar">
+        <div class="brand">BLA<span>ZT</span></div>
+        <div class="topbar-actions">
+            <button class="icon-btn" aria-label="Partager BLATZ" onclick="openCommunityShareModal()"><i class="fa-solid fa-share-nodes"></i></button>
+            <button class="icon-btn" aria-label="Proposer un groupe" onclick="openAddModal()"><i class="fa-solid fa-plus"></i></button>
+        </div>
+    </header>
+
+    <!-- 04. ÉCRAN ACCUEIL -->
+    <main>
+        <section class="screen active" id="screen-home">
+            <div class="hero">
+                <div class="eyebrow">Ton annuaire WhatsApp</div>
+                <h1>Découvre ta prochaine communauté.</h1>
+                <p>Explore les groupes et chaînes, trouve ceux qui t'intéressent et rejoins-les en quelques secondes.</p>
+                <div class="hero-actions">
+                    <button class="primary-btn" onclick="showScreen('explore')"><i class="fa-solid fa-compass"></i> Explorer</button>
+                    <button class="secondary-btn" onclick="openAddModal()"><i class="fa-solid fa-plus"></i> Proposer un lien</button>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card"><strong id="stat-groups">—</strong><span>Liens publiés</span></div>
+                <div class="stat-card"><strong id="stat-favorites">0</strong><span>Mes favoris</span></div>
+                <div class="stat-card"><strong><i class="fa-solid fa-bolt" style="color:var(--gold)"></i></strong><span>Accès direct</span></div>
+            </div>
+
+            <!-- 04-A. ADSTERRA : emplacement publicitaire principal 320x50 -->
+            <div class="ad-wrap" id="adsterra-top-slot">
+                <script>
+                    var atOptions = {
+                        'key' : '76f5803619b67c0e9bdbaf47aec52a69',
+                        'format' : 'iframe',
+                        'height' : 50,
+                        'width' : 320,
+                        'params' : {}
+                    };
+                </script>
+                <script src="https://bauval.org/22/76f5803619b67c0e9bdbaf47aec52a69"></script>
+            </div>
+
+            <div class="section-head">
+                <h2><i class="fa-solid fa-fire" style="color:var(--gold);margin-right:6px"></i>Les plus populaires</h2>
+                <button class="text-link" onclick="showScreen('explore')">Tout voir</button>
+            </div>
+            <div class="popular-row" id="popular-list">
+                <div class="empty-state" style="width:100%">Chargement des groupes...</div>
+            </div>
+
+            <div class="section-head">
+                <h2>À découvrir</h2>
+                <button class="text-link" onclick="showScreen('explore')">Explorer <i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+            <div class="group-list" id="home-groups">
+                <div class="empty-state">Chargement des groupes...</div>
+            </div>
+        </section>
+
+        <!-- 05. ÉCRAN EXPLORER -->
+        <section class="screen" id="screen-explore">
+            <div class="eyebrow">Annuaire</div>
+            <h1>Explorer les liens</h1>
+            <p class="subtext">Recherche un groupe, une chaîne ou une communauté.</p>
+
+            <div class="search-field">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input id="searchInput" type="search" placeholder="Rechercher un groupe..." oninput="renderExplorer()">
+            </div>
+            <div class="category-row" id="categoryFilters">
+                <button class="cat-btn active" data-category="Tous" onclick="setCategory('Tous',this)">Tous</button>
+                <button class="cat-btn" data-category="Communauté" onclick="setCategory('Communauté',this)">Communauté</button>
+                <button class="cat-btn" data-category="Groupe" onclick="setCategory('Groupe',this)">Groupe</button>
+                <button class="cat-btn" data-category="Chaîne" onclick="setCategory('Chaîne',this)">Chaîne</button>
+            </div>
+            <div class="section-head"><h2 id="explore-count">Tous les liens</h2></div>
+            <div class="group-list" id="explore-groups">
+                <div class="empty-state">Chargement des groupes...</div>
+            </div>
+        </section>
+
+        <!-- 06. ÉCRAN FAVORIS -->
+        <section class="screen" id="screen-favorites">
+            <div class="eyebrow">Collection personnelle</div>
+            <h1>Mes favoris</h1>
+            <p class="subtext">Retrouve ici les groupes que tu as enregistrés sur cet appareil.</p>
+            <div class="section-head"><h2 id="favorite-count">0 élément</h2></div>
+            <div class="group-list" id="favorite-groups">
+                <div class="empty-state"><i class="fa-regular fa-bookmark"></i><br>Tu n'as pas encore de favoris.</div>
+            </div>
+        </section>
+
+        <!-- 07. ÉCRAN PROFIL / INFORMATIONS -->
+        <section class="screen" id="screen-profile">
+            <div class="eyebrow">Espace BLATZ</div>
+            <h1>Ton espace</h1>
+            <p class="subtext">Quelques raccourcis pour utiliser l'annuaire.</p>
+            <div class="profile-card">
+                <button class="profile-line" style="width:100%;background:none;border:0;text-align:left" onclick="openAddModal()"><i class="fa-solid fa-circle-plus"></i><span>Proposer un groupe ou une chaîne</span></button>
+                <button class="profile-line" style="width:100%;background:none;border:0;text-align:left" onclick="openCommunityShareModal()"><i class="fa-solid fa-share-nodes"></i><span>Faire connaître BLATZ</span></button>
+                <button class="profile-line" style="width:100%;background:none;border:0;text-align:left" onclick="showScreen('favorites')"><i class="fa-solid fa-bookmark"></i><span>Voir mes favoris enregistrés</span></button>
+                <div class="profile-line"><i class="fa-solid fa-database"></i><span>Les groupes sont chargés depuis la base BLATZ.</span></div>
+                <div class="profile-line"><i class="fa-solid fa-mobile-screen"></i><span>Les favoris sont enregistrés localement sur cet appareil.</span></div>
+            </div>
+            <div class="ad-wrap" style="margin-top:18px">
+                <span style="font-size:.72rem;color:var(--muted)">Espace publicitaire</span>
+            </div>
+        </section>
+    </main>
+
+    <!-- 08. MODALE : PROPOSITION D'UN GROUPE -->
+    <div class="modal" id="addModal" role="dialog" aria-modal="true">
+        <div class="modal-box">
+            <div class="modal-head"><span id="addModalTitle">Proposer un lien WhatsApp</span><button class="close-btn" onclick="closeModal('addModal')">&times;</button></div>
+            <div id="groupForm">
+                <div class="form-group"><label for="groupName">Nom du groupe / chaîne *</label><input id="groupName" type="text" placeholder="Ex : Actualités Tech"></div>
+                <div class="form-group"><label for="groupCategory">Catégorie *</label><select id="groupCategory"><option value="Communauté">Communauté</option><option value="Groupe">Groupe</option><option value="Chaîne">Chaîne</option></select></div>
+                <div class="form-group"><label for="groupLink">Lien d'invitation WhatsApp *</label><input id="groupLink" type="url" placeholder="https://chat.whatsapp.com/..."></div>
+                <div class="form-group"><label for="groupImageFile">Image de profil (facultatif)</label><input id="groupImageFile" type="file" accept="image/*" onchange="previewSelectedImage(event)"><img id="previewImg" alt="Aperçu" style="display:none;width:54px;height:54px;object-fit:cover;border-radius:50%;margin-top:8px"></div>
+                <div class="form-group"><label for="groupDesc">Description *</label><textarea id="groupDesc" rows="3" placeholder="Présente brièvement cette communauté..."></textarea></div>
+                <button class="submit-btn" id="btnPublish" onclick="addNewGroup()">Envoyer la proposition</button>
+            </div>
+            <div id="successAdContainer" style="display:none">
+                <p style="color:var(--green);font-weight:850;text-align:center;margin:6px 0 14px"><i class="fa-solid fa-circle-check"></i> Proposition envoyée avec succès !</p>
+                <!-- 08-A. ADSTERRA : publicité après soumission 300x250 -->
+                <div class="ad-wrap ad-large" id="adsterra-after-submit">
+                    <script>
+                        var atOptions = {
+                            'key' : 'a7e9ef116873e6527fc7a4ee0daf8be2',
+                            'format' : 'iframe',
+                            'height' : 250,
+                            'width' : 300,
+                            'params' : {}
+                        };
+                    </script>
+                    <script src="https://bauval.org/22/a7e9ef116873e6527fc7a4ee0daf8be2"></script>
+                </div>
+                <button class="submit-btn" onclick="closeModal('addModal')">Fermer</button>
+            </div>
+        </div>
     </div>
-    <div class="stats">
-      <div class="stat"><div class="stat-icon"><i class="fa-solid fa-users"></i></div><strong id="stat-groups">—</strong><span>Communautés</span></div>
-      <div class="stat"><div class="stat-icon"><i class="fa-solid fa-fire"></i></div><strong id="stat-popular">—</strong><span>En tendance</span></div>
-      <div class="stat"><div class="stat-icon"><i class="fa-solid fa-heart"></i></div><strong id="stat-favs">0</strong><span>Mes favoris</span></div>
+
+    <!-- 08-B. MODALE : PARTAGE -->
+    <div class="modal" id="shareModal" role="dialog" aria-modal="true">
+        <div class="modal-box">
+            <div class="modal-head"><span id="shareTitle">Partager BLATZ</span><button class="close-btn" onclick="closeModal('shareModal')">&times;</button></div>
+            <div class="share-preview" id="sharePreview"></div>
+            <div class="share-buttons">
+                <button class="share-wa" onclick="executeWaShare()"><i class="fa-brands fa-whatsapp"></i> WhatsApp</button>
+                <button class="share-copy" onclick="executeCopyShare()"><i class="fa-solid fa-copy"></i> Copier</button>
+            </div>
+        </div>
     </div>
-    <div class="section-head"><h2><i class="fa-solid fa-fire" style="color:var(--gold)"></i> Tendances</h2><button class="text-action" onclick="navigate('explore')">Tout voir</button></div>
-    <div class="popular-row" id="popular-list"><div class="loading">Chargement des tendances…</div></div>
-    <div class="ad-slot" id="home-ad"><span>ESPACE PUBLICITAIRE</span></div>
-    <div class="section-head"><h2><i class="fa-regular fa-clock" style="color:var(--cyan)"></i> Dernières découvertes</h2><button class="text-action" onclick="navigate('explore')">Explorer</button></div>
-    <div class="group-list" id="recent-list"><div class="loading">Chargement…</div></div>
-  </section>
+</div>
 
-  <section class="page" id="page-explore">
-    <div class="section-head"><h2>Explorer les communautés</h2><span id="result-count" style="font-size:.7rem;color:var(--muted)"></span></div>
-    <div class="search-wrap"><i class="fa-solid fa-magnifying-glass"></i><input id="searchInput" type="search" placeholder="Nom, thème ou description…" autocomplete="off"></div>
-    <div class="chips" id="categoryChips">
-      <button class="chip active" data-category="Tous">Tout</button>
-      <button class="chip" data-category="Communauté">Communautés</button>
-      <button class="chip" data-category="Groupe">Groupes</button>
-      <button class="chip" data-category="Chaîne">Chaînes</button>
-    </div>
-    <div class="ad-slot"><span>ESPACE PUBLICITAIRE</span></div>
-    <div class="group-list" id="group-list"><div class="loading"><div class="spinner"></div>Chargement des communautés…</div></div>
-  </section>
-
-  <section class="page" id="page-favorites">
-    <div class="section-head"><h2>Mes favoris</h2><span style="font-size:.7rem;color:var(--muted)">Enregistrés sur cet appareil</span></div>
-    <p style="color:var(--muted);font-size:.82rem;line-height:1.5;margin-bottom:16px">Retrouve ici les communautés que tu souhaites garder sous la main.</p>
-    <div class="group-list" id="favorite-list"></div>
-  </section>
-
-  <section class="page" id="page-profile">
-    <div class="profile-card">
-      <div class="profile-symbol"><i class="fa-solid fa-user-astronaut"></i></div>
-      <h2>Ton espace BLATZ</h2>
-      <p>Pas besoin de créer un compte. Tes favoris et ton historique restent enregistrés sur cet appareil.</p>
-    </div>
-    <button class="menu-row" onclick="navigate('favorites')"><i class="fa-solid fa-heart"></i><span>Mes favoris</span><small id="profile-favs">0</small><i class="fa-solid fa-chevron-right"></i></button>
-    <button class="menu-row" onclick="showHistory()"><i class="fa-solid fa-clock-rotate-left"></i><span>Historique des visites</span><i class="fa-solid fa-chevron-right"></i></button>
-    <button class="menu-row" onclick="shareApp()"><i class="fa-solid fa-share-nodes"></i><span>Faire connaître BLATZ</span><i class="fa-solid fa-chevron-right"></i></button>
-    <button class="menu-row" onclick="installApp()"><i class="fa-solid fa-download"></i><span>Installer BLATZ</span><small id="install-label">Disponible</small></button>
-    <button class="menu-row" onclick="showAbout()"><i class="fa-solid fa-circle-info"></i><span>À propos de BLATZ</span><i class="fa-solid fa-chevron-right"></i></button>
-    <div class="ad-slot"><span>ESPACE PUBLICITAIRE</span></div>
-    <p style="text-align:center;color:#697589;font-size:.68rem;margin:20px 0">BLAZT © 2026 · Découvre. Connecte. Partage.</p>
-  </section>
-</main>
-
+<!-- 09. NAVIGATION PRINCIPALE FIXÉE EN BAS -->
 <nav class="bottom-nav" aria-label="Navigation principale">
-  <div class="nav-inner">
-    <button class="nav-item active" data-page="home"><i class="fa-solid fa-house"></i><span>Accueil</span></button>
-    <button class="nav-item" data-page="explore"><i class="fa-solid fa-compass"></i><span>Explorer</span></button>
-    <button class="nav-item" data-page="favorites"><i class="fa-solid fa-heart"></i><span>Favoris</span></button>
-    <button class="nav-item" data-page="profile"><i class="fa-solid fa-user"></i><span>Profil</span></button>
-  </div>
+    <button class="nav-item active" data-screen="home" onclick="showScreen('home',this)"><i class="fa-solid fa-house"></i><span>Accueil</span></button>
+    <button class="nav-item" data-screen="explore" onclick="showScreen('explore',this)"><i class="fa-solid fa-compass"></i><span>Explorer</span></button>
+    <button class="nav-item" data-screen="favorites" onclick="showScreen('favorites',this)"><i class="fa-regular fa-bookmark"></i><span>Favoris</span></button>
+    <button class="nav-item" data-screen="profile" onclick="showScreen('profile',this)"><i class="fa-regular fa-user"></i><span>Profil</span></button>
 </nav>
+<div class="toast" id="toast"></div>
 
-<div class="modal-backdrop" id="addModal" onclick="if(event.target===this)closeAddModal()">
-  <div class="modal">
-    <div class="modal-head"><h2>Proposer une communauté</h2><button class="close" onclick="closeAddModal()" aria-label="Fermer">×</button></div>
-    <p style="font-size:.78rem;color:var(--muted);line-height:1.5">Propose un groupe ou une chaîne WhatsApp. La publication dépend des règles de validation configurées dans la base de données.</p>
-    <form id="addForm">
-      <div class="field"><label for="groupName">Nom *</label><input id="groupName" maxlength="80" required placeholder="Ex. Communauté Tech CI"></div>
-      <div class="field"><label for="groupCategory">Type *</label><select id="groupCategory"><option>Communauté</option><option>Groupe</option><option>Chaîne</option></select></div>
-      <div class="field"><label for="groupLink">Lien WhatsApp *</label><input id="groupLink" type="url" required placeholder="https://chat.whatsapp.com/…"></div>
-      <div class="field"><label for="groupDesc">Description *</label><textarea id="groupDesc" rows="3" maxlength="350" required placeholder="Présente cette communauté…"></textarea></div>
-      <div class="field"><label for="groupImageFile">Image (facultatif)</label><input id="groupImageFile" type="file" accept="image/*"></div>
-      <button class="btn btn-primary submit" type="submit" id="publishBtn"><i class="fa-solid fa-paper-plane"></i> Envoyer la proposition</button>
-    </form>
-  </div>
-</div>
-
-<div class="modal-backdrop" id="infoModal" onclick="if(event.target===this)closeInfo()">
-  <div class="modal"><div class="modal-head"><h2 id="infoTitle">Information</h2><button class="close" onclick="closeInfo()">×</button></div><div id="infoContent" style="font-size:.84rem;color:#b6c1d1;line-height:1.6"></div></div>
-</div>
-<div class="toast" id="toast" role="status" aria-live="polite"></div>
-
+<!-- 10. JAVASCRIPT : logique séparée en sous-sections -->
 <script>
-/* Configuration existante du projet */
-const SUPABASE_URL = 'https://sfxamqoacoczxczgvocn.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_34Quu1yFLtyCrhu5-hNqyA_NQyOPtgh';
-const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+    /* 10-A. CONFIGURATION SUPABASE : conserver les identifiants du projet */
+    const SUPABASE_URL = 'https://sfxamqoacoczxczgvocn.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_34Quu1yFLtyCrhu5-hNqyA_NQyOPtgh';
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-let allGroups = [];
-let activeCategory = 'Tous';
-let deferredInstallPrompt = null;
-const FAVORITES_KEY = 'blatz_favorites_v1';
-const HISTORY_KEY = 'blatz_history_v1';
-let favorites = readLocal(FAVORITES_KEY, []);
-let history = readLocal(HISTORY_KEY, []);
+    /* 10-B. ÉTAT DE L'APPLICATION */
+    let allGroups = [];
+    let currentCategory = 'Tous';
+    let compressedImageBase64 = '';
+    let activeShareText = '';
+    let favorites = loadFavorites();
 
-function readLocal(key, fallback){try{return JSON.parse(localStorage.getItem(key)) ?? fallback}catch{return fallback}}
-function saveLocal(){localStorage.setItem(FAVORITES_KEY,JSON.stringify(favorites));localStorage.setItem(HISTORY_KEY,JSON.stringify(history));updateLocalStats()}
-function escapeHTML(value=''){return String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function safeUrl(value=''){try{const u=new URL(value);return ['https:','http:'].includes(u.protocol)?u.href:'#'}catch{return '#'}}
-function toast(message){const el=document.getElementById('toast');el.textContent=message;el.classList.add('show');clearTimeout(toast.timer);toast.timer=setTimeout(()=>el.classList.remove('show'),2500)}
-function navigate(page){
-  document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id==='page-'+page));
-  document.querySelectorAll('.nav-item').forEach(b=>b.classList.toggle('active',b.dataset.page===page));
-  if(page==='favorites')renderFavorites();
-  window.scrollTo({top:0,behavior:'smooth'});
-}
-document.querySelectorAll('.nav-item').forEach(b=>b.addEventListener('click',()=>navigate(b.dataset.page)));
-document.querySelectorAll('.chip').forEach(b=>b.addEventListener('click',()=>{
-  activeCategory=b.dataset.category;
-  document.querySelectorAll('.chip').forEach(x=>x.classList.toggle('active',x===b));
-  renderGroups();
-}));
-document.getElementById('searchInput').addEventListener('input',renderGroups);
+    /* 10-C. OUTILS GÉNÉRAUX */
+    function loadFavorites() {
+        try { return JSON.parse(localStorage.getItem('blatz_favorites') || '[]'); }
+        catch (_) { return []; }
+    }
+    function saveFavorites() {
+        localStorage.setItem('blatz_favorites', JSON.stringify(favorites));
+        document.getElementById('stat-favorites').textContent = favorites.length;
+    }
+    function escapeHtml(value) {
+        return String(value ?? '').replace(/[&<>"']/g, char => ({
+            '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'
+        }[char]));
+    }
+    function showToast(message) {
+        const toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.classList.add('show');
+        clearTimeout(showToast.timer);
+        showToast.timer = setTimeout(() => toast.classList.remove('show'), 2300);
+    }
+    function showScreen(name, clickedButton) {
+        document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
+        const target = document.getElementById('screen-' + name);
+        if (target) target.classList.add('active');
+        document.querySelectorAll('.nav-item').forEach(btn => btn.classList.toggle('active', btn.dataset.screen === name));
+        if (name === 'favorites') renderFavorites();
+        if (name === 'explore') renderExplorer();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+    function openAddModal() {
+        document.getElementById('groupForm').style.display = 'block';
+        document.getElementById('successAdContainer').style.display = 'none';
+        document.getElementById('addModal').classList.add('show');
+    }
 
-function avatar(group,small=false){
-  const cls='avatar';
-  return group.image ? `<img class="${cls}" src="${escapeHTML(group.image)}" alt="" loading="lazy" onerror="this.outerHTML='<div class=&quot;avatar&quot;><i class=&quot;fa-solid fa-users&quot;></i></div>'">` : `<div class="${cls}"><i class="fa-solid fa-users"></i></div>`;
-}
-function groupCard(g){
-  const id=String(g.id ?? '');
-  const saved=favorites.includes(id);
-  const link=safeUrl(g.link||'');
-  const trend=(Number(g.clicks)||0)>0?`<span class="trend"><i class="fa-solid fa-fire"></i> ${Number(g.clicks)||0} vues</span>`:'';
-  return `<article class="group-card ${(Number(g.clicks)||0)>0?'featured':''}">
-    <div class="group-top">${avatar(g)}<div class="group-info"><div class="group-name">${escapeHTML(g.name||'Communauté sans nom')}</div><div class="group-meta"><span class="tag">${escapeHTML(g.category||'Général')}</span>${trend}</div></div></div>
-    <p class="group-desc">${escapeHTML(g.description||'Aucune description disponible.')}</p>
-    <div class="card-bottom"><a class="join" href="${link}" target="_blank" rel="noopener noreferrer" onclick="recordVisit('${encodeURIComponent(id)}')"><i class="fa-brands fa-whatsapp"></i> Rejoindre</a>
-    <button class="small-action ${saved?'saved':''}" aria-label="${saved?'Retirer des favoris':'Ajouter aux favoris'}" onclick="toggleFavorite('${encodeURIComponent(id)}')"><i class="fa-${saved?'solid':'regular'} fa-heart"></i></button>
-    <button class="small-action" aria-label="Partager" onclick="shareGroup('${encodeURIComponent(id)}')"><i class="fa-solid fa-share-nodes"></i></button></div>
-  </article>`;
-}
-function renderGroups(){
-  const q=(document.getElementById('searchInput')?.value||'').trim().toLowerCase();
-  const filtered=allGroups.filter(g=>{
-    const cat=activeCategory==='Tous'||String(g.category||'').toLowerCase()===activeCategory.toLowerCase();
-    const hay=[g.name,g.category,g.description].join(' ').toLowerCase();
-    return cat&&hay.includes(q);
-  });
-  document.getElementById('result-count').textContent=filtered.length+' résultat(s)';
-  document.getElementById('group-list').innerHTML=filtered.length?filtered.map(groupCard).join(''):`<div class="empty"><i class="fa-solid fa-magnifying-glass"></i><br>Aucune communauté trouvée.<br>Essaie un autre mot ou une autre catégorie.</div>`;
-}
-function renderPopular(){
-  const sorted=[...allGroups].sort((a,b)=>(Number(b.clicks)||0)-(Number(a.clicks)||0)).slice(0,6);
-  document.getElementById('popular-list').innerHTML=sorted.length?sorted.map(g=>`<article class="popular-card"><div class="group-top">${avatar(g,true)}<div class="group-info"><div class="group-name">${escapeHTML(g.name||'Communauté')}</div><div class="group-meta">${Number(g.clicks)||0} vues</div></div></div><a class="join" href="${safeUrl(g.link||'')}" target="_blank" rel="noopener noreferrer" onclick="recordVisit('${encodeURIComponent(String(g.id??''))}')">Découvrir</a></article>`).join(''):`<div class="empty" style="min-width:100%">Les tendances apparaîtront ici dès que des communautés seront disponibles.</div>`;
-}
-function renderHome(){
-  const recent=[...allGroups].slice(-4).reverse();
-  document.getElementById('recent-list').innerHTML=recent.length?recent.map(groupCard).join(''):`<div class="empty">Les nouvelles communautés apparaîtront ici.</div>`;
-  renderPopular();updateLocalStats();
-}
-function updateLocalStats(){
-  document.getElementById('stat-groups').textContent=allGroups.length;
-  document.getElementById('stat-popular').textContent=allGroups.filter(g=>(Number(g.clicks)||0)>0).length;
-  document.getElementById('stat-favs').textContent=favorites.length;
-  document.getElementById('profile-favs').textContent=favorites.length;
-}
-function renderFavorites(){
-  const items=allGroups.filter(g=>favorites.includes(String(g.id)));
-  document.getElementById('favorite-list').innerHTML=items.length?items.map(groupCard).join(''):`<div class="empty"><i class="fa-regular fa-heart"></i><br>Aucun favori pour le moment.<br>Appuie sur le cœur d'une communauté pour la retrouver ici.</div>`;
-}
-function toggleFavorite(encodedId){
-  const id=decodeURIComponent(encodedId);
-  favorites=favorites.includes(id)?favorites.filter(x=>x!==id):[...favorites,id];
-  saveLocal();renderGroups();renderHome();renderFavorites();
-  toast(favorites.includes(id)?'Ajouté à tes favoris':'Retiré des favoris');
-}
-function recordVisit(encodedId){
-  const id=decodeURIComponent(encodedId);
-  history=[id,...history.filter(x=>x!==id)].slice(0,30);saveLocal();
-  const g=allGroups.find(x=>String(x.id)===id);
-  if(g&&supabaseClient){supabaseClient.from('groups').update({clicks:(Number(g.clicks)||0)+1}).eq('id',g.id).then(({error})=>{if(!error){g.clicks=(Number(g.clicks)||0)+1;renderPopular();}});}
-}
-function shareGroup(encodedId){
-  const g=allGroups.find(x=>String(x.id)===decodeURIComponent(encodedId));if(!g)return;
-  const text=`Découvre ${g.name} sur BLATZ !\n${g.description||''}\nLien WhatsApp : ${g.link}\nAnnuaire : https://devnas2.github.io/BLATZ-/`;
-  shareText(text);
-}
-async function shareText(text){
-  if(navigator.share){try{await navigator.share({title:'BLATZ',text});return}catch(e){if(e.name==='AbortError')return}}
-  try{await navigator.clipboard.writeText(text);toast('Lien copié')}catch{showInfo('Partager BLATZ',escapeHTML(text).replace(/\n/g,'<br>'))}
-}
-function shareApp(){shareText('Découvre BLATZ, l’annuaire de communautés WhatsApp ! https://devnas2.github.io/BLATZ-/')}
-function showInfo(title,content){document.getElementById('infoTitle').textContent=title;document.getElementById('infoContent').innerHTML=content;document.getElementById('infoModal').classList.add('show')}
-function closeInfo(){document.getElementById('infoModal').classList.remove('show')}
-function showAbout(){showInfo('À propos de BLATZ','BLATZ est un annuaire indépendant pour découvrir et partager des groupes, communautés et chaînes WhatsApp. Les données des communautés sont chargées depuis Supabase. Les favoris et l’historique sont conservés localement sur cet appareil.')}
-function showHistory(){
-  const names=history.map(id=>allGroups.find(g=>String(g.id)===id)?.name).filter(Boolean);
-  showInfo('Historique des visites',names.length?names.map(n=>'• '+escapeHTML(n)).join('<br>'):'Aucune visite enregistrée sur cet appareil.');
-}
-function openAddModal(){document.getElementById('addModal').classList.add('show')}
-function closeAddModal(){document.getElementById('addModal').classList.remove('show')}
-function validWhatsAppLink(value){try{const u=new URL(value);return u.protocol==='https:'&&(u.hostname==='chat.whatsapp.com'||u.hostname==='whatsapp.com'||u.hostname==='www.whatsapp.com'||u.hostname==='whatsapp.net')}catch{return false}}
-async function compressImage(file){
-  if(!file)return '';
-  if(!file.type.startsWith('image/'))throw new Error('Le fichier choisi doit être une image.');
-  if(file.size>5*1024*1024)throw new Error('Image trop lourde (maximum 5 Mo).');
-  return new Promise((resolve,reject)=>{
-    const reader=new FileReader();reader.onerror=()=>reject(new Error('Lecture de l’image impossible.'));
-    reader.onload=()=>{const img=new Image();img.onerror=()=>reject(new Error('Image invalide.'));
-      img.onload=()=>{const c=document.createElement('canvas');const scale=Math.min(1,500/Math.max(img.width,img.height));c.width=Math.round(img.width*scale);c.height=Math.round(img.height*scale);c.getContext('2d').drawImage(img,0,0,c.width,c.height);resolve(c.toDataURL('image/jpeg',.72));};img.src=reader.result;};
-    reader.readAsDataURL(file);
-  });
-}
-document.getElementById('addForm').addEventListener('submit',async e=>{
-  e.preventDefault();
-  const name=document.getElementById('groupName').value.trim();
-  const category=document.getElementById('groupCategory').value;
-  const link=document.getElementById('groupLink').value.trim();
-  const description=document.getElementById('groupDesc').value.trim();
-  const file=document.getElementById('groupImageFile').files[0];
-  if(!validWhatsAppLink(link)){toast('Entre un lien officiel WhatsApp valide.');return}
-  if(!supabaseClient){toast('Connexion à la base de données indisponible.');return}
-  const btn=document.getElementById('publishBtn');btn.disabled=true;btn.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> Envoi…';
-  try{
-    const image=await compressImage(file);
-    /* Conserve les colonnes utilisées par le site d’origine. */
-    const record={name,category,link,description,image,clicks:0};
-    const {error}=await supabaseClient.from('groups').insert([record]);
-    if(error)throw error;
-    e.target.reset();closeAddModal();toast('Proposition envoyée avec succès');await loadGroups();
-  }catch(err){console.error(err);toast('Échec de l’envoi : '+(err.message||'erreur inconnue'))}
-  finally{btn.disabled=false;btn.innerHTML='<i class="fa-solid fa-paper-plane"></i> Envoyer la proposition'}
-});
-async function loadGroups(){
-  const list=document.getElementById('group-list');
-  if(!supabaseClient){list.innerHTML='<div class="empty">Le service de données ne peut pas être initialisé.</div>';return}
-  const {data,error}=await supabaseClient.from('groups').select('*');
-  if(error){console.error('Supabase:',error);list.innerHTML='<div class="empty">Impossible de charger les communautés. Vérifie ta connexion puis actualise la page.</div>';document.getElementById('popular-list').innerHTML='';return}
-  allGroups=data||[];
-  renderGroups();renderHome();renderFavorites();
-}
-let installPromptEvent=null;
-window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();installPromptEvent=e;document.getElementById('install-label').textContent='Disponible'});
-async function installApp(){
-  if(installPromptEvent){installPromptEvent.prompt();const result=await installPromptEvent.userChoice;installPromptEvent=null;toast(result.outcome==='accepted'?'Installation lancée':'Installation annulée');}
-  else showInfo('Installer BLATZ','Sur Android avec Chrome : ouvre le menu ⋮ du navigateur, puis choisis <b>Installer l’application</b> ou <b>Ajouter à l’écran d’accueil</b>.');
-}
-window.addEventListener('appinstalled',()=>{toast('BLATZ est installé sur ton appareil');document.getElementById('install-label').textContent='Installé'});
-if('serviceWorker' in navigator && location.protocol.startsWith('http'))window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(err=>console.warn('Service worker:',err)));
-loadGroups();
+    /* 10-D. CARTES DE GROUPES : création d'un affichage réutilisable */
+    function imageMarkup(group) {
+        if (group.image && typeof group.image === 'string' && group.image.trim()) {
+            return `<img src="${escapeHtml(group.image)}" alt="">`;
+        }
+        return '<i class="fa-solid fa-users"></i>';
+    }
+    function groupCard(group) {
+        const saved = favorites.some(id => String(id) === String(group.id));
+        const name = escapeHtml(group.name || 'Sans nom');
+        const category = escapeHtml(group.category || 'Général');
+        const description = escapeHtml(group.description || 'Aucune description.');
+        const link = /^https:\/\/(chat\.whatsapp\.com|whatsapp\.com|www\.whatsapp\.com|whatsapp\.net)\//i.test(group.link || '') ? group.link : '#';
+        return `
+            <article class="group-card">
+                <div class="group-head">
+                    <div class="avatar">${imageMarkup(group)}</div>
+                    <div class="group-info">
+                        <div class="group-name">${name}</div>
+                        <div class="group-category">${category} · ${Number(group.clicks || 0)} vue(s)</div>
+                    </div>
+                </div>
+                <p class="group-description">${description}</p>
+                <div class="group-actions">
+                    <a class="join-btn" href="${escapeHtml(link)}" target="_blank" rel="noopener" onclick="trackClick('${escapeHtml(group.id)}')"><i class="fa-brands fa-whatsapp"></i> Rejoindre</a>
+                    <button class="small-action ${saved ? 'saved' : ''}" aria-label="Favori" onclick="toggleFavorite('${escapeHtml(group.id)}')"><i class="fa-${saved ? 'solid' : 'regular'} fa-bookmark"></i></button>
+                    <button class="small-action" aria-label="Partager" onclick="openGroupShareModal('${escapeHtml(group.name || '')}','${escapeHtml(group.link || '')}')"><i class="fa-solid fa-share-nodes"></i></button>
+                </div>
+            </article>`;
+    }
+
+    /* 10-E. FAVORIS LOCAUX */
+    function toggleFavorite(id) {
+        const key = String(id);
+        if (favorites.some(item => String(item) === key)) {
+            favorites = favorites.filter(item => String(item) !== key);
+            showToast('Retiré des favoris');
+        } else {
+            favorites.push(id);
+            showToast('Ajouté aux favoris');
+        }
+        saveFavorites();
+        renderExplorer();
+        renderHomeGroups();
+        renderFavorites();
+    }
+    function renderFavorites() {
+        const items = allGroups.filter(group => favorites.some(id => String(id) === String(group.id)));
+        document.getElementById('favorite-count').textContent = `${items.length} élément${items.length > 1 ? 's' : ''}`;
+        document.getElementById('favorite-groups').innerHTML = items.length
+            ? items.map(groupCard).join('')
+            : '<div class="empty-state"><i class="fa-regular fa-bookmark"></i><br>Tu n’as pas encore de favoris.<br><small>Enregistre un groupe depuis Explorer.</small></div>';
+        document.getElementById('stat-favorites').textContent = favorites.length;
+    }
+
+    /* 10-F. CHARGEMENT SUPABASE */
+    async function loadGroups() {
+        const { data, error } = await _supabase.from('groups').select('*');
+        if (error) {
+            console.error('Erreur Supabase :', error);
+            const errorBox = '<div class="empty-state">Impossible de charger les groupes. Vérifie la connexion à Supabase.</div>';
+            document.getElementById('home-groups').innerHTML = errorBox;
+            document.getElementById('explore-groups').innerHTML = errorBox;
+            document.getElementById('popular-list').innerHTML = errorBox;
+            return;
+        }
+        allGroups = data || [];
+        document.getElementById('stat-groups').textContent = allGroups.length;
+        renderHomeGroups();
+        renderPopular();
+        renderExplorer();
+        renderFavorites();
+    }
+
+    /* 10-G. ACCUEIL ET CLASSEMENT POPULAIRE */
+    function sortedGroups() {
+        return [...allGroups].sort((a,b) => Number(b.clicks || 0) - Number(a.clicks || 0));
+    }
+    function renderPopular() {
+        const list = sortedGroups().slice(0,5);
+        document.getElementById('popular-list').innerHTML = list.length ? list.map((group,index) => `
+            <article class="popular-card">
+                <div class="popular-top">
+                    <div class="avatar">${imageMarkup(group)}</div>
+                    <div style="min-width:0">
+                        <div class="popular-name">${escapeHtml(group.name || 'Sans nom')}</div>
+                        <div class="tiny-muted">${Number(group.clicks || 0)} vues · ${index === 0 ? '★ Populaire' : 'À découvrir'}</div>
+                    </div>
+                </div>
+                <button class="join-btn" style="width:100%;border:0" onclick="openGroupLink('${escapeHtml(group.id)}')"><i class="fa-brands fa-whatsapp"></i> Voir le groupe</button>
+            </article>`).join('')
+            : '<div class="empty-state" style="width:100%">Les groupes populaires apparaîtront ici.</div>';
+    }
+    function renderHomeGroups() {
+        const items = sortedGroups().slice(0,3);
+        document.getElementById('home-groups').innerHTML = items.length
+            ? items.map(groupCard).join('')
+            : '<div class="empty-state">Aucun groupe disponible pour le moment.</div>';
+    }
+    function openGroupLink(id) {
+        const group = allGroups.find(item => String(item.id) === String(id));
+        if (group && group.link) {
+            trackClick(id);
+            window.open(group.link, '_blank', 'noopener');
+        }
+    }
+
+    /* 10-H. EXPLORATION ET FILTRES */
+    function setCategory(category, button) {
+        currentCategory = category;
+        document.querySelectorAll('.cat-btn').forEach(item => item.classList.remove('active'));
+        button.classList.add('active');
+        renderExplorer();
+    }
+    function renderExplorer() {
+        const query = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
+        const filtered = allGroups.filter(group => {
+            const categoryMatch = currentCategory === 'Tous' || (group.category || '').toLowerCase() === currentCategory.toLowerCase();
+            const text = `${group.name || ''} ${group.category || ''} ${group.description || ''}`.toLowerCase();
+            return categoryMatch && text.includes(query);
+        });
+        document.getElementById('explore-count').textContent = `${filtered.length} résultat${filtered.length > 1 ? 's' : ''}`;
+        document.getElementById('explore-groups').innerHTML = filtered.length
+            ? filtered.map(groupCard).join('')
+            : '<div class="empty-state"><i class="fa-solid fa-magnifying-glass"></i><br>Aucun résultat trouvé.</div>';
+    }
+
+    /* 10-I. COMPTEUR DE CLICS */
+    async function trackClick(groupId) {
+        const group = allGroups.find(item => String(item.id) === String(groupId));
+        if (!group) return;
+        group.clicks = Number(group.clicks || 0) + 1;
+        const { error } = await _supabase.from('groups').update({ clicks: group.clicks }).eq('id', groupId);
+        if (error) console.warn('Compteur non mis à jour :', error.message);
+        renderPopular();
+    }
+
+    /* 10-J. APERÇU IMAGE DU FORMULAIRE */
+    function previewSelectedImage(event) {
+        const file = event.target.files && event.target.files[0];
+        const preview = document.getElementById('previewImg');
+        if (!file) {
+            compressedImageBase64 = '';
+            preview.style.display = 'none';
+            return;
+        }
+        if (!file.type.startsWith('image/')) {
+            showToast('Choisis un fichier image.');
+            event.target.value = '';
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = new Image();
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                const maxSize = 200;
+                let width = img.width, height = img.height;
+                if (width > height && width > maxSize) { height *= maxSize / width; width = maxSize; }
+                else if (height > maxSize) { width *= maxSize / height; height = maxSize; }
+                canvas.width = width; canvas.height = height;
+                canvas.getContext('2d').drawImage(img,0,0,width,height);
+                compressedImageBase64 = canvas.toDataURL('image/jpeg', .7);
+                preview.src = compressedImageBase64;
+                preview.style.display = 'block';
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    /* 10-K. SOUMISSION D'UN GROUPE : conserve la table groups d'origine */
+    async function addNewGroup() {
+        const name = document.getElementById('groupName').value.trim();
+        const category = document.getElementById('groupCategory').value;
+        const link = document.getElementById('groupLink').value.trim();
+        const description = document.getElementById('groupDesc').value.trim();
+        if (!name || !link || !description) { showToast('Remplis le nom, le lien et la description.'); return; }
+        if (!/^https:\/\/(chat\.whatsapp\.com|whatsapp\.com|www\.whatsapp\.com|whatsapp\.net)\//i.test(link)) {
+            showToast('Ajoute un lien WhatsApp valide.'); return;
+        }
+        const record = {
+            id: Date.now(), name, category, link, description,
+            image: compressedImageBase64, clicks: 0
+        };
+        const button = document.getElementById('btnPublish');
+        button.disabled = true;
+        button.textContent = 'Envoi en cours...';
+        const { error } = await _supabase.from('groups').insert([record]);
+        button.disabled = false;
+        button.textContent = 'Envoyer la proposition';
+        if (error) { showToast('Erreur Supabase : ' + error.message); return; }
+
+        document.getElementById('groupName').value = '';
+        document.getElementById('groupLink').value = '';
+        document.getElementById('groupDesc').value = '';
+        document.getElementById('groupImageFile').value = '';
+        document.getElementById('previewImg').style.display = 'none';
+        compressedImageBase64 = '';
+        document.getElementById('groupForm').style.display = 'none';
+        document.getElementById('successAdContainer').style.display = 'block';
+        document.getElementById('addModalTitle').textContent = 'Merci pour ta proposition';
+        loadGroups();
+    }
+
+    /* 10-L. PARTAGE DU SITE ET DES GROUPES */
+    function openCommunityShareModal() {
+        activeShareText = `👋 Découvre BLATZ, l'annuaire pour trouver des groupes et chaînes WhatsApp.\nExplore les communautés et partage tes propres découvertes !\n\n🔗 https://devnas2.github.io/BLATZ-/`;
+        document.getElementById('shareTitle').textContent = 'Faire connaître BLATZ';
+        document.getElementById('sharePreview').textContent = activeShareText;
+        document.getElementById('shareModal').classList.add('show');
+    }
+    function openGroupShareModal(name, link) {
+        activeShareText = `🔥 Découvre "${name}" sur BLATZ !\n\nLien WhatsApp : ${link}\nAnnuaire BLATZ : https://devnas2.github.io/BLATZ-/`;
+        document.getElementById('shareTitle').textContent = 'Partager ce groupe';
+        document.getElementById('sharePreview').textContent = activeShareText;
+        document.getElementById('shareModal').classList.add('show');
+    }
+    function executeWaShare() {
+        window.open('https://api.whatsapp.com/send?text=' + encodeURIComponent(activeShareText), '_blank', 'noopener');
+    }
+    async function executeCopyShare() {
+        try {
+            await navigator.clipboard.writeText(activeShareText);
+            showToast('Message copié.');
+        } catch (_) {
+            showToast('Copie non disponible sur ce navigateur.');
+        }
+    }
+
+    /* 10-M. DÉMARRAGE */
+    saveFavorites();
+    loadGroups();
 </script>
 </body>
 </html>
