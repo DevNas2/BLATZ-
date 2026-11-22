@@ -6,7 +6,7 @@
          Fichier unique : index.html
          Organisation :
          01 Configuration / 02 Styles / 03 En-tête
-         04 Accueil / 05 Explorer / 06 Favoris / 07 Profil
+         04 Accueil / 05 Explorer / 06 Favoris / 07 Profil / 07B CANAL 12
          08 Modales / 09 Navigation / 10 JavaScript
          ========================================================= -->
     <meta charset="UTF-8">
@@ -198,19 +198,33 @@
             background: rgba(37,211,102,.14); color: var(--green);
         }
         .profile-badge.offline { background: rgba(245,158,11,.15); color: #fcd34d; }
+        .canal12-banner {
+            display: flex; align-items: center; justify-content: space-between; gap: 12px;
+            padding: 15px 16px; border-radius: 17px;
+            background: linear-gradient(135deg, rgba(139,92,246,.16), rgba(0,200,223,.12));
+            border: 1px solid rgba(139,92,246,.35);
+        }
+        .canal12-banner-title { font-size: .95rem; font-weight: 900; letter-spacing: .5px; }
+        .canal12-banner-sub { color: var(--muted); font-size: .75rem; margin-top: 3px; }
+        .canal12-enter-btn {
+            border: 0; border-radius: 11px; padding: 10px 14px;
+            background: var(--purple); color: #ffffff; font-weight: 800; font-size: .78rem;
+            display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+        }
         .bottom-nav {
             position: fixed; z-index: 100; left: 0; right: 0; bottom: 0;
-            display: grid; grid-template-columns: repeat(4,1fr); gap: 3px;
-            padding: 8px 9px calc(8px + env(safe-area-inset-bottom));
+            display: grid; grid-template-columns: repeat(5,1fr); gap: 2px;
+            padding: 8px 6px calc(8px + env(safe-area-inset-bottom));
             background: rgba(8,11,17,.95); border-top: 1px solid var(--border);
             backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
         }
         .nav-item {
             min-height: 55px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px;
-            color: #8290a4; background: none; border: 0; border-radius: 12px; font-size: .68rem; font-weight: 750;
+            color: #8290a4; background: none; border: 0; border-radius: 12px; font-size: .65rem; font-weight: 750;
         }
-        .nav-item i { font-size: 1.12rem; }
+        .nav-item i { font-size: 1.08rem; }
         .nav-item.active { color: var(--green); background: rgba(37,211,102,.09); }
+        .nav-item[data-screen="canal12"].active { color: #c4b5fd; background: rgba(139,92,246,.16); }
         .modal {
             display: none; position: fixed; inset: 0; z-index: 300;
             background: rgba(0,0,0,.82); padding: 15px; overflow-y: auto;
@@ -270,7 +284,7 @@
         <button onclick="loadGroups(true)">Actualiser</button>
     </div>
 
-    <!-- 04. ÉCRAN ACCUEIL -->
+    <!-- 04. ÉCRAN ACCUEIL (aucun contenu du CANAL 12 affiché ici) -->
     <main>
         <section class="screen active" id="screen-home">
             <div class="hero">
@@ -290,18 +304,7 @@
             </div>
 
             <!-- 04-A. ADSTERRA : emplacement publicitaire principal 320x50 -->
-            <div class="ad-wrap" id="adsterra-top-slot">
-                <script>
-                    atOptions = {
-                        'key' : '76f5803619b67c0e9bdbaf47aec52a69',
-                        'format' : 'iframe',
-                        'height' : 50,
-                        'width' : 320,
-                        'params' : {}
-                    };
-                </script>
-                <script src="https://bauval.org/22/76f5803619b67c0e9bdbaf47aec52a69"></script>
-            </div>
+            <div class="ad-wrap" id="adsterra-top-slot"></div>
 
             <div class="section-head">
                 <h2><i class="fa-solid fa-fire" style="color:var(--gold);margin-right:6px"></i>Les plus populaires</h2>
@@ -353,6 +356,22 @@
             </div>
         </section>
 
+        <!-- 07B. ÉCRAN CANAL 12 (visible uniquement dans la section CANAL 12) -->
+        <section class="screen" id="screen-canal12">
+            <div class="eyebrow" style="color:#c4b5fd">Espace dédié</div>
+            <h1>CANAL 12</h1>
+            <p class="subtext">Retrouve ici exclusivement les groupes ajoutés dans CANAL 12.</p>
+
+            <div class="section-head">
+                <h2 id="canal12-count">0 groupe dans CANAL 12</h2>
+                <button class="primary-btn" style="padding:8px 12px;font-size:.76rem" onclick="openAddModal('canal12')"><i class="fa-solid fa-plus"></i> Ajouter à CANAL 12</button>
+            </div>
+
+            <div class="group-list" id="canal12-groups">
+                <div class="empty-state"><i class="fa-solid fa-tv" style="color:var(--purple)"></i><br>Aucun groupe dans CANAL 12 pour le moment.</div>
+            </div>
+        </section>
+
         <!-- 07. ÉCRAN PROFIL / INFORMATIONS -->
         <section class="screen" id="screen-profile">
             <div class="eyebrow">Espace BLATZ</div>
@@ -360,6 +379,7 @@
             <p class="subtext">Quelques raccourcis pour utiliser l'annuaire et gérer l'application.</p>
             <div class="profile-card">
                 <button class="profile-line" id="profileInstallLine" style="width:100%;background:none;border:0;text-align:left" onclick="promptPwaInstall()"><i class="fa-solid fa-mobile-screen-button"></i><span id="profileInstallLabel">Installer l'application BLAZT</span><span class="profile-badge" id="profileInstallBadge">PWA</span></button>
+                <button class="profile-line" style="width:100%;background:none;border:0;text-align:left" onclick="showScreen('canal12')"><i class="fa-solid fa-tv" style="color:var(--purple)"></i><span>CANAL 12</span><span class="profile-badge" id="profileCanal12Badge">0</span></button>
                 <button class="profile-line" style="width:100%;background:none;border:0;text-align:left" onclick="openAddModal()"><i class="fa-solid fa-circle-plus"></i><span>Proposer un groupe ou une chaîne</span></button>
                 <button class="profile-line" style="width:100%;background:none;border:0;text-align:left" onclick="openCommunityShareModal()"><i class="fa-solid fa-share-nodes"></i><span>Faire connaître BLATZ</span></button>
                 <button class="profile-line" style="width:100%;background:none;border:0;text-align:left" onclick="showScreen('favorites')"><i class="fa-solid fa-bookmark"></i><span>Voir mes favoris enregistrés</span></button>
@@ -367,18 +387,7 @@
                 <div class="profile-line"><i class="fa-solid fa-database"></i><span>Les groupes sont synchronisés et sauvegardés hors ligne.</span></div>
             </div>
             <!-- 07-A. ADSTERRA : emplacement publicitaire profil 300x250 -->
-            <div class="ad-wrap ad-large" id="adsterra-profile-slot" style="margin-top:18px">
-                <script>
-                    atOptions = {
-                        'key' : 'a7e9ef116873e6527fc7a4ee0daf8be2',
-                        'format' : 'iframe',
-                        'height' : 250,
-                        'width' : 300,
-                        'params' : {}
-                    };
-                </script>
-                <script src="https://bauval.org/22/a7e9ef116873e6527fc7a4ee0daf8be2"></script>
-            </div>
+            <div class="ad-wrap ad-large" id="adsterra-profile-slot" style="margin-top:18px"></div>
         </section>
     </main>
 
@@ -387,6 +396,7 @@
         <div class="modal-box">
             <div class="modal-head"><span id="addModalTitle">Proposer un lien WhatsApp</span><button class="close-btn" onclick="closeModal('addModal')">&times;</button></div>
             <div id="groupForm">
+                <div class="form-group"><label for="groupSection">Section de destination *</label><select id="groupSection"><option value="standard">Annuaire principal</option><option value="canal12">CANAL 12</option></select></div>
                 <div class="form-group"><label for="groupName">Nom du groupe / chaîne *</label><input id="groupName" type="text" placeholder="Ex : Actualités Tech"></div>
                 <div class="form-group"><label for="groupCategory">Catégorie *</label><select id="groupCategory"><option value="Communauté">Communauté</option><option value="Groupe">Groupe</option><option value="Chaîne">Chaîne</option></select></div>
                 <div class="form-group"><label for="groupLink">Lien d'invitation WhatsApp *</label><input id="groupLink" type="url" placeholder="https://chat.whatsapp.com/..."></div>
@@ -397,18 +407,7 @@
             <div id="successAdContainer" style="display:none">
                 <p style="color:var(--green);font-weight:850;text-align:center;margin:6px 0 14px"><i class="fa-solid fa-circle-check"></i> Proposition envoyée avec succès !</p>
                 <!-- 08-A. ADSTERRA : publicité après soumission 300x250 -->
-                <div class="ad-wrap ad-large" id="adsterra-after-submit">
-                    <script>
-                        atOptions = {
-                            'key' : 'a7e9ef116873e6527fc7a4ee0daf8be2',
-                            'format' : 'iframe',
-                            'height' : 250,
-                            'width' : 300,
-                            'params' : {}
-                        };
-                    </script>
-                    <script src="https://bauval.org/22/a7e9ef116873e6527fc7a4ee0daf8be2"></script>
-                </div>
+                <div class="ad-wrap ad-large" id="adsterra-after-submit"></div>
                 <button class="submit-btn" onclick="closeModal('addModal')">Fermer</button>
             </div>
         </div>
@@ -431,6 +430,7 @@
 <nav class="bottom-nav" aria-label="Navigation principale">
     <button class="nav-item active" data-screen="home" onclick="showScreen('home',this)"><i class="fa-solid fa-house"></i><span>Accueil</span></button>
     <button class="nav-item" data-screen="explore" onclick="showScreen('explore',this)"><i class="fa-solid fa-compass"></i><span>Explorer</span></button>
+    <button class="nav-item" data-screen="canal12" onclick="showScreen('canal12',this)"><i class="fa-solid fa-tv"></i><span>CANAL 12</span></button>
     <button class="nav-item" data-screen="favorites" onclick="showScreen('favorites',this)"><i class="fa-regular fa-bookmark"></i><span>Favoris</span></button>
     <button class="nav-item" data-screen="profile" onclick="showScreen('profile',this)"><i class="fa-regular fa-user"></i><span>Profil</span></button>
 </nav>
@@ -443,15 +443,48 @@
     const SUPABASE_ANON_KEY = 'sb_publishable_34Quu1yFLtyCrhu5-hNqyA_NQyOPtgh';
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+    /* 10-A2. CHARGEMENT ISOLÉ DES BANNIÈRES ADSTERRA */
+    function renderAdsterraBanner(containerId, key, width, height, forceReload) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        if (container.dataset.loaded === '1' && !forceReload) return;
+
+        container.innerHTML = '';
+        const sandboxIframe = document.createElement('iframe');
+        sandboxIframe.width = String(width);
+        sandboxIframe.height = String(height);
+        sandboxIframe.style.width = width + 'px';
+        sandboxIframe.style.height = height + 'px';
+        sandboxIframe.style.maxWidth = '100%';
+        sandboxIframe.style.border = '0';
+        sandboxIframe.style.overflow = 'hidden';
+        sandboxIframe.setAttribute('scrolling', 'no');
+        sandboxIframe.setAttribute('frameborder', '0');
+        sandboxIframe.setAttribute('loading', 'lazy');
+
+        const adDoc = `<!DOCTYPE html><html><head><meta charset="utf-8"><style>html,body{margin:0;padding:0;background:transparent;overflow:hidden;display:flex;align-items:center;justify-content:center;}</style></head><body><script>atOptions={'key':'${key}','format':'iframe','height':${height},'width':${width},'params':{}};<\/script><script src="https://bauval.org/22/${key}"><\/script></body></html>`;
+
+        sandboxIframe.srcdoc = adDoc;
+        container.appendChild(sandboxIframe);
+        container.dataset.loaded = '1';
+    }
+
+    function initAdsterraSlots() {
+        if (!navigator.onLine) return;
+        renderAdsterraBanner('adsterra-top-slot', ADSTERRA_TOP.key, 320, 50, false);
+    }
+
     /* 10-B. ÉTAT DE L'APPLICATION & CLÉS DE CACHE */
     const CACHE_GROUPS_KEY = 'blatz_groups_cache_v1';
     const CACHE_TIME_KEY = 'blatz_groups_cache_time_v1';
     const PENDING_CLICKS_KEY = 'blatz_pending_clicks_v1';
+    const CANAL12_META_KEY = 'blatz_canal12_ids_v1';
     let allGroups = [];
     let currentCategory = 'Tous';
     let compressedImageBase64 = '';
     let activeShareText = '';
     let favorites = loadFavorites();
+    let canal12LocalIds = loadCanal12LocalIds();
     let deferredInstallPrompt = null;
 
     /* 10-C. OUTILS GÉNÉRAUX & CACHE LOCAL */
@@ -462,6 +495,30 @@
     function saveFavorites() {
         localStorage.setItem('blatz_favorites', JSON.stringify(favorites));
         document.getElementById('stat-favorites').textContent = favorites.length;
+    }
+    function loadCanal12LocalIds() {
+        try { return JSON.parse(localStorage.getItem(CANAL12_META_KEY) || '[]').map(String); }
+        catch (_) { return []; }
+    }
+    function saveCanal12LocalId(id) {
+        const key = String(id);
+        if (!canal12LocalIds.includes(key)) {
+            canal12LocalIds.push(key);
+            localStorage.setItem(CANAL12_META_KEY, JSON.stringify(canal12LocalIds));
+        }
+    }
+    function isCanal12Group(group) {
+        if (!group) return false;
+        const sectionVal = String(group.section || group.canal || group.channel || '').trim().toLowerCase();
+        if (sectionVal === 'canal12' || sectionVal === 'canal 12' || sectionVal === '12') return true;
+        if (String(group.category || '').trim().toLowerCase() === 'canal 12' || String(group.category || '').trim().toLowerCase() === 'canal12') return true;
+        return canal12LocalIds.includes(String(group.id));
+    }
+    function publicDirectoryGroups() {
+        return allGroups.filter(group => !isCanal12Group(group));
+    }
+    function canal12Groups() {
+        return allGroups.filter(group => isCanal12Group(group));
     }
     function saveGroupsCache(groups) {
         try {
@@ -517,13 +574,19 @@
         document.querySelectorAll('.nav-item').forEach(btn => btn.classList.toggle('active', btn.dataset.screen === name));
         if (name === 'favorites') renderFavorites();
         if (name === 'explore') renderExplorer();
-        if (name === 'profile') updateCacheStatusUI();
+        if (name === 'canal12') renderCanal12();
+        if (name === 'profile') { updateCacheStatusUI(); renderAdsterraBanner('adsterra-profile-slot', ADSTERRA_AFTER_SUBMIT.key, 300, 250, true); }
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
     function closeModal(id) { document.getElementById(id).classList.remove('show'); }
-    function openAddModal() {
+    function openAddModal(defaultSection) {
         document.getElementById('groupForm').style.display = 'block';
         document.getElementById('successAdContainer').style.display = 'none';
+        document.getElementById('addModalTitle').textContent = defaultSection === 'canal12' ? 'Ajouter un groupe à CANAL 12' : 'Proposer un lien WhatsApp';
+        const sectionSelect = document.getElementById('groupSection');
+        if (sectionSelect) {
+            sectionSelect.value = defaultSection === 'canal12' ? 'canal12' : 'standard';
+        }
         document.getElementById('addModal').classList.add('show');
     }
 
@@ -584,11 +647,16 @@
         return '<i class="fa-solid fa-users"></i>';
     }
     function renderAllLists() {
-        document.getElementById('stat-groups').textContent = allGroups.length;
+        const pubCount = publicDirectoryGroups().length;
+        const c12Count = canal12Groups().length;
+        document.getElementById('stat-groups').textContent = pubCount;
+        const profileC12Badge = document.getElementById('profileCanal12Badge');
+        if (profileC12Badge) profileC12Badge.textContent = String(c12Count);
         renderHomeGroups();
         renderPopular();
         renderExplorer();
         renderFavorites();
+        renderCanal12();
     }
     function groupCard(group) {
         const saved = favorites.some(id => String(id) === String(group.id));
@@ -628,6 +696,7 @@
         renderExplorer();
         renderHomeGroups();
         renderFavorites();
+        renderCanal12();
     }
     function renderFavorites() {
         const items = allGroups.filter(group => favorites.some(id => String(id) === String(group.id)));
@@ -636,6 +705,21 @@
             ? items.map(groupCard).join('')
             : '<div class="empty-state"><i class="fa-regular fa-bookmark"></i><br>Tu n’as pas encore de favoris.<br><small>Enregistre un groupe depuis Explorer.</small></div>';
         document.getElementById('stat-favorites').textContent = favorites.length;
+    }
+
+    /* 10-E2. SECTION CANAL 12 */
+    function renderCanal12() {
+        const items = canal12Groups();
+        const countEl = document.getElementById('canal12-count');
+        const listEl = document.getElementById('canal12-groups');
+        if (countEl) {
+            countEl.textContent = `${items.length} groupe${items.length > 1 ? 's' : ''} dans CANAL 12`;
+        }
+        if (listEl) {
+            listEl.innerHTML = items.length
+                ? items.map(groupCard).join('')
+                : '<div class="empty-state"><i class="fa-solid fa-tv" style="color:var(--purple)"></i><br>Aucun groupe dans CANAL 12 pour le moment.<br><small>Utilise « Ajouter à CANAL 12 » pour publier ici.</small></div>';
+        }
     }
 
     /* 10-F. CHARGEMENT SUPABASE AVEC FALLBACK CACHE HORS LIGNE */
@@ -652,6 +736,7 @@
                 document.getElementById('home-groups').innerHTML = offlineBox;
                 document.getElementById('explore-groups').innerHTML = offlineBox;
                 document.getElementById('popular-list').innerHTML = offlineBox;
+                document.getElementById('canal12-groups').innerHTML = offlineBox;
             } else if (manual) {
                 showToast('Tu es hors ligne · Cache local affiché');
             }
@@ -669,6 +754,7 @@
             document.getElementById('home-groups').innerHTML = errorBox;
             document.getElementById('explore-groups').innerHTML = errorBox;
             document.getElementById('popular-list').innerHTML = errorBox;
+            document.getElementById('canal12-groups').innerHTML = errorBox;
             return;
         }
         allGroups = data || [];
@@ -680,9 +766,9 @@
         loadGroups(true);
     }
 
-    /* 10-G. ACCUEIL ET CLASSEMENT POPULAIRE */
+    /* 10-G. ACCUEIL ET CLASSEMENT POPULAIRE (EXCLUSIVEMENT HORS CANAL 12) */
     function sortedGroups() {
-        return [...allGroups].sort((a,b) => Number(b.clicks || 0) - Number(a.clicks || 0));
+        return [...publicDirectoryGroups()].sort((a,b) => Number(b.clicks || 0) - Number(a.clicks || 0));
     }
     function renderPopular() {
         const list = sortedGroups().slice(0,5);
@@ -713,7 +799,7 @@
         }
     }
 
-    /* 10-H. EXPLORATION ET FILTRES */
+    /* 10-H. EXPLORATION ET FILTRES (EXCLUSIVEMENT HORS CANAL 12) */
     function setCategory(category, button) {
         currentCategory = category;
         document.querySelectorAll('.cat-btn').forEach(item => item.classList.remove('active'));
@@ -722,7 +808,7 @@
     }
     function renderExplorer() {
         const query = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
-        const filtered = allGroups.filter(group => {
+        const filtered = publicDirectoryGroups().filter(group => {
             const categoryMatch = currentCategory === 'Tous' || (group.category || '').toLowerCase() === currentCategory.toLowerCase();
             const text = `${group.name || ''} ${group.category || ''} ${group.description || ''}`.toLowerCase();
             return categoryMatch && text.includes(query);
@@ -812,6 +898,8 @@
             showToast('Connexion internet requise pour publier un lien.');
             return;
         }
+        const sectionChoice = document.getElementById('groupSection')?.value || 'standard';
+        const targetCanal12 = sectionChoice === 'canal12';
         const name = document.getElementById('groupName').value.trim();
         const category = document.getElementById('groupCategory').value;
         const link = document.getElementById('groupLink').value.trim();
@@ -820,8 +908,9 @@
         if (!/^https:\/\/(chat\.whatsapp\.com|whatsapp\.com|www\.whatsapp\.com|whatsapp\.net)\//i.test(link)) {
             showToast('Ajoute un lien WhatsApp valide.'); return;
         }
+        const recordId = Date.now();
         const record = {
-            id: Date.now(), name, category, link, description,
+            id: recordId, name, category, link, description,
             image: compressedImageBase64, clicks: 0
         };
         const button = document.getElementById('btnPublish');
@@ -832,6 +921,10 @@
         button.textContent = 'Envoyer la proposition';
         if (error) { showToast('Erreur Supabase : ' + error.message); return; }
 
+        if (targetCanal12) {
+            saveCanal12LocalId(recordId);
+        }
+
         document.getElementById('groupName').value = '';
         document.getElementById('groupLink').value = '';
         document.getElementById('groupDesc').value = '';
@@ -840,19 +933,26 @@
         compressedImageBase64 = '';
         document.getElementById('groupForm').style.display = 'none';
         document.getElementById('successAdContainer').style.display = 'block';
-        document.getElementById('addModalTitle').textContent = 'Merci pour ta proposition';
+        renderAdsterraBanner('adsterra-after-submit', ADSTERRA_AFTER_SUBMIT.key, 300, 250, true);
+        document.getElementById('addModalTitle').textContent = targetCanal12 ? 'Ajouté à CANAL 12' : 'Merci pour ta proposition';
         loadGroups();
     }
 
     /* 10-L. PARTAGE DU SITE ET DES GROUPES */
     function openCommunityShareModal() {
-        activeShareText = `👋 Découvre BLATZ, l'annuaire pour trouver des groupes et chaînes WhatsApp.\nExplore les communautés et partage tes propres découvertes !\n\n🔗 https://devnas2.github.io/BLATZ-/`;
+        activeShareText = `👋 Découvre BLATZ, l'annuaire pour trouver des groupes et chaînes WhatsApp.
+Explore les communautés et partage tes propres découvertes !
+
+🔗 https://devnas2.github.io/BLATZ-/`;
         document.getElementById('shareTitle').textContent = 'Faire connaître BLATZ';
         document.getElementById('sharePreview').textContent = activeShareText;
         document.getElementById('shareModal').classList.add('show');
     }
     function openGroupShareModal(name, link) {
-        activeShareText = `🔥 Découvre "${name}" sur BLATZ !\n\nLien WhatsApp : ${link}\nAnnuaire BLATZ : https://devnas2.github.io/BLATZ-/`;
+        activeShareText = `🔥 Découvre "${name}" sur BLATZ !
+
+Lien WhatsApp : ${link}
+Annuaire BLATZ : https://devnas2.github.io/BLATZ-/`;
         document.getElementById('shareTitle').textContent = 'Partager ce groupe';
         document.getElementById('sharePreview').textContent = activeShareText;
         document.getElementById('shareModal').classList.add('show');
@@ -872,6 +972,7 @@
     /* 10-M. ÉCOUTEURS RÉSEAU & DÉMARRAGE */
     window.addEventListener('online', () => {
         updateCacheStatusUI();
+        initAdsterraSlots();
         showToast('Connexion rétablie · Synchronisation...');
         loadGroups();
     });
@@ -881,6 +982,7 @@
     });
 
     initPwa();
+    initAdsterraSlots();
     saveFavorites();
     updateCacheStatusUI();
     loadGroups();
